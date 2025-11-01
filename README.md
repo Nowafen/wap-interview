@@ -181,18 +181,56 @@ sqlmap -u "http://example.com/user.php?id=1" -D webapp -T users --dump
 
 ---
 
-### 6. با SQLMAP آشنا هستید؟ کار tamper چیست؟ چند تا Tamper را نام ببرید.
 
-بله، tamper یک سری اسکریپت می باشد که نوع درخواست ما را تغییر می دهد تا web application firewall آن را بلاک نکند
-`
-Between,base64encode,charencode,space2randomblan
-`
+<details markdown="1"> <summary><h3> 6. با SQLMAP آشنا هستید؟ کار tamper چیست؟ چند تا Tamper را نام ببرید. </h3></summary>
+
+بله، **tamper** مجموعه‌ای از **اسکریپت‌های پایتون** در SQLMap است که **payload تزریقی** را قبل از ارسال به سرور **تغییر شکل** می‌دهند تا **WAF** (فایروال اپلیکیشن وب) را **بایپس** کنند. این تغییر شامل **رمزنگاری، جایگزینی کاراکترها، افزودن نویز یا شکستن الگوهای مشکوک** می‌شود.
+
+---
+
+### نمونه‌های کاربردی از tamperها:
+
+| نام tamper | عملکرد | مثال قبل از اعمال | مثال بعد از اعمال |
+|-----------|--------|-------------------|-------------------|
+| `base64encode` | کل payload را به **Base64** تبدیل می‌کند | `' OR 1=1--` | `JysgT1IgMT0xLS0=` |
+| `charencode` | کاراکترها را به **Hex/URL encode** تبدیل می‌کند | `' UNION SELECT` | `%27%20%55%4e%49%4f%4e%20%53%45%4c%45%43%54` |
+| `space2comment` | فاصله‌ها را با `/**/` جایگزین می‌کند | `' OR 1=1` | `'/**/OR/**/1=1` |
+| `between` | بین کاراکترها **random character** اضافه می‌کند | `' AND 1=1` | `'A BETWEEN 'x' AND 'y' AND 1=1` |
+| `space2randomblank` | فاصله را با **blankهای تصادفی** (tab،newline و ...) جایگزین می‌کند | `' OR 1=1` | `'[TAB]OR[NEWLINE]1=1` |
+| `apostrophemask` | آپاستروف را با **UTF-8 encoding** مخفی می‌کند | `' OR '1'='1` | `%ef%bc%87 OR %ef%bc%871%ef%bc%87=%ef%bc%871` |
+
+---
+
+### نحوه استفاده در SQLMap:
+
+```bash
+# استفاده از یک tamper
+sqlmap -u "http://site.com/vuln.php?id=1" --tamper=space2comment
+
+# استفاده همزمان از چند tamper
+sqlmap -u "http://site.com/vuln.php?id=1" --tamper=base64encode,space2comment
+
+# اعمال تمام tamperهای موجود
+sqlmap -u "http://site.com/vuln.php?id=1" --tamper=*
+```
+
+---
+> **منابع برای مطالعه بیشتر:**  
+> - مستندات رسمی tamperها: [github.com/sqlmapproject/sqlmap/wiki/Tamper-scripts](https://github.com/sqlmapproject/sqlmap/wiki/Tamper-scripts)  
+> - لیست کامل tamperها: `sqlmap/tamper/` در ریپازیتوری  
+> - تمرین عملی: در **DVWA** یا **WebGoat** با WAF فعال تست کنید  
+
+</details>
   
   ---
 
-### 7. حمله xss چیست؟ آیا می توانید نحوه جلوگیری از این آسیب پذیری را بگویید؟
 
-حمله ای است که هکر اسکریپت مخرب را روی صفحه وبی که یوزرها آن را مشاهده می کنند تزریق کند.برای جلوگیری باید input validation و output encode داشت.
+<details markdown="1"> <summary><h3> 7. حمله XSS چیست؟ نحوه جلوگیری از آن را بگویید. </h3></summary>
+
+  حمله‌ای است که هکر اسکریپت مخرب را در صفحه تزریق می‌کند تا cookieها را بدزدد.
+  
+**انواع**: Reflected (در URL)، Stored (در DB)، DOM-based (در JS). برای جلوگیری، input validation (sanitize chars)، output encoding (مانند HTML entities) و CSP header استفاده کنید.
+</details>
 
 ---  
 
